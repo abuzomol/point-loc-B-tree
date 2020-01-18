@@ -40,17 +40,17 @@ int main() {
   }
 
   cout << n ;
-  for(int i = 0 ; i < n ; i++)
-  {
-    cout <<"\n" << lineSegs[i];
-  }
 
   vector<Node> nodes;
   nodes.reserve(n);
   for(int i = 0 ; i< n; i++)
   {
-    nodes[i].setIthChild();
+      int j = 0;
+      nodes[i].setIthVal(lineSegs[i], j);
   }
-
+    for(int i = 0 ; i < n ; i++)
+    {
+        cout <<"\n" << nodes[i];
+    }
   return 0;
 }
