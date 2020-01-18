@@ -3,13 +3,23 @@
 //
 
 #include "Node.h"
-Node::Node(){Node::val.reserve(B_SIZE);}
-Node::Node(){Node::val.reserve(B_SIZE);}
-Node::Node(const std::vector<LineSegment> &val) : val(val) {}
+Node::Node(){
+  Node::val.reserve(Val_SIZE);
+  Node::child.reserve(CHILD_SIZE);
+  Node::minMaxX.reserve(CHILD_SIZE);
+}
+Node::Node(const std::vector<LineSegment> &val): val(val)
+{
+  Node::child.reserve(CHILD_SIZE);
+  Node::minMaxX.reserve(CHILD_SIZE);
+}
+Node::Node(const std::vector<LineSegment> &val, const std::vector<Node*> &child,
+std::vector<double> &minMaxX) : val(val) , child(child), minMaxX (minMaxX) {}
 const std::vector<LineSegment> &Node::getVal() const { return val; }
 void Node::setVal(const std::vector<LineSegment> &val) { Node::val = val; }
 const std::vector<Node *> &Node::getChild() const { return child; }
 void Node::setChild(const std::vector<Node *> &child) { Node::child = child; }
+void setIthVal(const LineSegment &lineSegment, int &i){Node::val[i] = lineSegment;}
 const std::vector<double> &Node::getMinMaxX() const { return minMaxX; }
 void Node::setMinMaxX(const std::vector<double> &minMaxX) {
   Node::minMaxX = minMaxX;

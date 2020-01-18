@@ -23,8 +23,11 @@ private:
 public:
   Node();
   Node(const std::vector<LineSegment> &val);
+  Node(const std::vector<LineSegment> &val, const std::vector<Node*> &child,
+             std::vector<double> &minMaxX);
   const std::vector<LineSegment> &getVal() const;
   void setVal(const std::vector<LineSegment> &val);
+  void setIthVal(const LineSegment &lineSegment, int &i);
   const std::vector<Node *> &getChild() const;
   void setChild(const std::vector<Node *> &child);
   const std::vector<double> &getMinMaxX() const;
