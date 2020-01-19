@@ -39,9 +39,10 @@
 #define QUERY 2
 */
 
-#define B_SIZE 2
+#define B_SIZE 5
 #define CHILD_SIZE B_SIZE
-#define Val_SIZE 1
+#define VAL_SIZE 4
+#define MIN_VAL_SIZE 2
 #define A_SIZE 2
 
 #endif // POINT_LOC_B_TREE_GLOBAL_CONST_H
