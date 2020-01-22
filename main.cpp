@@ -64,7 +64,7 @@ int main()
   Tree tree(height);
   tree.buildBottomUpBTree(nodes);
   Node root = tree.getRoot();
-  cout << "\n:" << root;
+  cout << "\n:" <<  root;
 
   return 0;
 }
