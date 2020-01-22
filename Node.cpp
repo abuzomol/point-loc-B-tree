@@ -36,6 +36,11 @@ void Node::setMinMaxX(const std::vector<double>& minMaxX)
 {
   Node::minMaxX = minMaxX;
 }
+void Node::setIthMinMaxX(const double& minMax, const int& i)
+{
+  Node::minMaxX[i] = minMax;
+}
+
 const Node* Node::getIthChild(int& i) const { return child[i]; }
 void Node::setIthChild(Node& node, int& i) { Node::child[i] = &node; }
 

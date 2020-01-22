@@ -35,7 +35,7 @@ class Node
   void setChild(const std::vector<Node*>& child);
   const std::vector<double>& getMinMaxX() const;
   void setMinMaxX(const std::vector<double>& minMaxX);
-
+  void setIthMinMaxX(const double& minMax, const int& i);
   const Node* getIthChild(int& i) const;
   void setIthChild(Node& node, int& i);
   friend std::ostream& operator<<(std::ostream& os, const Node& node);

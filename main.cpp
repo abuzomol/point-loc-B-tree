@@ -9,12 +9,10 @@
 #include "Node.h"
 #include "Point.h"
 #include "SuperNode.h"
+#include "Tree.h"
 
 using namespace std;
 
-using namespace std;
-
-void BuildBottomUpBTree(vector<vector<Node>>& tree, const vector<Node>& nodes);
 int main()
 {
   ifstream fin("line-seg.txt");
@@ -54,6 +52,7 @@ int main()
     for(unsigned int j = 0; j < VAL_SIZE; j++)
     {
       nodes[i].setIthVal(lineSegs[i*VAL_SIZE + j] , j);
+      nodes[i].setIthMinMaxX(lineSegs[i*VAL_SIZE + j].getXLeft(), j);
     }
   }
   for (int i = 0; i < nodesTotal; i++)
@@ -62,26 +61,10 @@ int main()
   }
 
   unsigned int height = ceil(log2(nodes.size()) / log2(CHILD_SIZE)) + 1;
-  vector<vector<Node>> tree (height) ;
-
-  BuildBottomUpBTree(tree, nodes);
+  Tree tree(height);
+  tree.buildBottomUpBTree(nodes);
+  Node root = tree.getRoot();
+  cout << "\n:" << root;
 
   return 0;
-}
-
-void BuildBottomUpBTree(vector<vector<Node>>& tree, const vector<Node>& nodes)
-{
-  int height = tree.size();
-  cout << "\n height: " << height;
-  tree[height - 1 ] = nodes;
-
-  for(int i = height - 2; i > -1 ; --i)
-  {
-    int size = tree[i+1].size() % CHILD_SIZE == 0? tree[i+1].size() / CHILD_SIZE:
-               (tree[i+1].size() / CHILD_SIZE )+ 1 ;
-
-    cout << "\nsize: " << size;
-    tree[i].resize(size);
-  }
-
 }
