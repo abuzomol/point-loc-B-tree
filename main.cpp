@@ -62,7 +62,7 @@ int main()
 
   unsigned int height = ceil(log2(nodes.size()) / log2(CHILD_SIZE)) + 1;
   Tree tree(height);
-  tree.buildBottomUpBTree(nodes);
+  tree.buildBottomUpBTree(nodes, true);
   Node root = tree.getRoot();
   cout << "\n:" <<  root;
 

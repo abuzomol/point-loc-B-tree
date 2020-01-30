@@ -7,22 +7,17 @@
 #include "Node.h"
 MiddleNode::MiddleNode()
 {
-  MiddleNode::val.reserve(VAL_SIZE);
-  MiddleNode::child.reserve(CHILD_SIZE);
-  MiddleNode::minX.reserve(CHILD_SIZE);
-  MiddleNode::maxX.reserve(CHILD_SIZE);
-}
+  MiddleNode::val.resize(VAL_SIZE);
+  MiddleNode::child.resize(CHILD_SIZE);
+ }
 MiddleNode::MiddleNode(const std::vector<LineSegment>& val) : val(val)
 {
-  MiddleNode::child.reserve(CHILD_SIZE);
-  MiddleNode::minX.reserve(CHILD_SIZE);
-  MiddleNode::maxX.reserve(CHILD_SIZE);
+  MiddleNode::child.resize(CHILD_SIZE);
 }
 MiddleNode::MiddleNode(const std::vector<LineSegment>& val,
                        const std::vector<MiddleNode*>& child,
-                       std::vector<double>& minX,
-                       std::vector<double>& maxX)
-    : val(val), child(child), minX(minX), maxX(maxX)
+                       const unsigned int& spannedSlabs)
+    : val(val), child(child) , spannedSlabs(spannedSlabs)
 {
 }
 const std::vector<LineSegment>& MiddleNode::getVal() const { return val; }
@@ -35,16 +30,12 @@ void MiddleNode::setChild(const std::vector<MiddleNode*>& child)
 {
   MiddleNode::child = child;
 }
-const std::vector<double>& MiddleNode::getMinX() const { return minX; }
-void MiddleNode::setMinX(const std::vector<double>& minX)
+
+void MiddleNode::setIthVal(const LineSegment& lineSegment, const int& i)
 {
-  MiddleNode::minX = minX;
+  MiddleNode::val[i] = lineSegment;
 }
-const std::vector<double>& MiddleNode::getMaxX() const { return maxX; }
-void MiddleNode::setMaxX(const std::vector<double>& maxX)
-{
-  MiddleNode::maxX = maxX;
-}
+
 const MiddleNode* MiddleNode::getIthChild(int& i) const { return child[i]; }
 void MiddleNode::setIthChild(MiddleNode& node, int& i)
 {

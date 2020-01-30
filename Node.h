@@ -8,7 +8,6 @@
 #include <algorithm>
 #include <ostream>
 #include <vector>
-
 #include "LineSegment.h"
 #include "global_const.h"
 
@@ -31,6 +30,8 @@ class Node
   const std::vector<LineSegment>& getVal() const;
   void setVal(const std::vector<LineSegment>& val);
   void setIthVal(const LineSegment& lineSegment,const int& i);
+  const LineSegment& getIthVal(const int& i) const;
+  void setValSize(const unsigned int& valSize) ;
   const std::vector<Node*>& getChild() const;
   void setChild(const std::vector<Node*>& child);
   const std::vector<double>& getMinMaxX() const;
@@ -38,6 +39,9 @@ class Node
   void setIthMinMaxX(const double& minMax, const int& i);
   const Node* getIthChild(int& i) const;
   void setIthChild(Node& node, int& i);
+  const unsigned int getValSize() const;
+
+  const bool &  underflow() const;
   friend std::ostream& operator<<(std::ostream& os, const Node& node);
 };
 

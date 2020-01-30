@@ -16,7 +16,7 @@ class Tree
 
  public:
   Tree(const int& height);
-  void buildBottomUpBTree(const std::vector<Node>& nodes);
+  void buildBottomUpBTree(const std::vector<Node>& nodes, const bool& direction);
   const Node& getRoot() const;
 };
 

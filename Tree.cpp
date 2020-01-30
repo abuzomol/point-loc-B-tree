@@ -9,12 +9,23 @@ using namespace std;
 
 Tree::Tree(const int& height) { tree.resize(height); }
 
-void Tree::buildBottomUpBTree(const vector<Node>& nodes)
+void Tree::buildBottomUpBTree(const vector<Node>& nodes, const bool &direction)
 {
   int height = Tree::tree.size();
   cout << "\n height: " << height;
   Tree::tree[height - 1] = nodes;
 
+  /*//check if last element is underflow
+  int last = nodes.size()-1;
+  if(Tree::tree[height-1].size() > 1  && Tree::tree[height - 1][last].underflow() )
+  {
+    if(last >= 1 )
+    {
+      int mid =
+          (Tree::tree[height - 1][nodes.size() - 2].getValSize() + Tree::tree[height - 1][last].getValSize() )/ 2;
+    }
+  }*/
+  // go over every level in the tree
   for (int i = height - 2; i > -1; --i)
   {
     int size = Tree::tree[i + 1].size() % CHILD_SIZE == 0
@@ -23,6 +34,7 @@ void Tree::buildBottomUpBTree(const vector<Node>& nodes)
 
     cout << "\nsize: " << size;
     Tree::tree[i].resize(size);
+    //go over every node in each level
     for (int j = 0; j < Tree::tree[i].size(); j++)
     {
       // set up the children
@@ -32,10 +44,19 @@ void Tree::buildBottomUpBTree(const vector<Node>& nodes)
         {
           Tree::tree[i][j].setIthChild(Tree::tree[i + 1][j * CHILD_SIZE + k],
                                        k);
-          Tree::tree[i][j].setIthMinMaxX(
-              *std::min_element(Tree::tree[i + 1][j].getMinMaxX().begin(),
-                       Tree::tree[i + 1][j].getMinMaxX().end()),
-              k);
+          if (direction)
+          {
+            double minValue = *std::min_element(Tree::tree[i + 1][j].getMinMaxX().begin(),
+                              Tree::tree[i + 1][j].getMinMaxX().end());
+            Tree::tree[i][j].setIthMinMaxX(minValue, k);
+          }
+          else
+          {
+            Tree::tree[i][j].setIthMinMaxX(
+                *std::max_element(Tree::tree[i + 1][j].getMinMaxX().begin(),
+                                  Tree::tree[i + 1][j].getMinMaxX().end()),
+                k);
+          }
         }
         // set up the values (skip every node with index multiple of CHILD_SIZE)
         if (k < VAL_SIZE && j * CHILD_SIZE + k < Tree::tree[i + 1].size())

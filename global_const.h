@@ -42,7 +42,7 @@
 #define B_SIZE 5
 #define CHILD_SIZE B_SIZE
 #define VAL_SIZE 4
-#define MIN_VAL_SIZE 2
+#define MIN_VAL 2
 #define A_SIZE 2
 
 #endif // POINT_LOC_B_TREE_GLOBAL_CONST_H
