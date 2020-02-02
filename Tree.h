@@ -6,6 +6,7 @@
 #define POINT_LOC_B_TREE_TREE_H
 
 #include <vector>
+#include <set>
 #include <iostream>
 #include "Node.h"
 
@@ -17,6 +18,7 @@ class Tree
  public:
   Tree(const int& height);
   void buildBottomUpBTree(const std::vector<Node>& nodes, const bool& direction);
+  void fillTree(std::set<LineSegment, YLeftLessThan>& lineSegments);
   const Node& getRoot() const;
 };
 

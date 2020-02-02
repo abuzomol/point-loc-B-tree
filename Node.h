@@ -38,10 +38,10 @@ class Node
   void setMinMaxX(const std::vector<double>& minMaxX);
   void setIthMinMaxX(const double& minMax, const int& i);
   const Node* getIthChild(int& i) const;
-  void setIthChild(Node& node, int& i);
+  void setIthChild(Node& node, const int& i);
   const unsigned int getValSize() const;
 
-  const bool &  underflow() const;
+  const bool underflow() const;
   friend std::ostream& operator<<(std::ostream& os, const Node& node);
 };
 

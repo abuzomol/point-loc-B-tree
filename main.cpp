@@ -10,6 +10,7 @@
 #include "Point.h"
 #include "SuperNode.h"
 #include "Tree.h"
+#include "SuperTree.h"
 
 using namespace std;
 
@@ -44,6 +45,17 @@ int main()
 
   cout << n;
 
+  // get all x coordinates from lineSegments
+  vector<double> xValues;
+  xValues.resize(2*n);
+  for(int i = 0; i < n ; i ++)
+  {
+    xValues[i << 1] = lineSegs[i].getXLeft();
+    xValues[(i << 1) + 1 ] = lineSegs[i].getXRight();
+  }
+  //sort xValues.
+  sort(xValues.begin(), xValues.end());
+  //create the leaves nodes first
   vector<Node> nodes;
   unsigned int nodesTotal = ceil(n/VAL_SIZE);
   nodes.resize(nodesTotal);
@@ -66,5 +78,22 @@ int main()
   Node root = tree.getRoot();
   cout << "\n:" <<  root;
 
+  //construct the leaves of the superTree;
+  vector<SuperNode> superNodes;
+  unsigned int superNodesTotal = ceil(2*n/VAL_SIZE);
+  superNodes.resize(superNodesTotal);
+  for (unsigned int i = 0; i < superNodesTotal; i++)
+  {
+    for(unsigned int j = 0; j < VAL_SIZE; j++)
+    {
+      superNodes[i].setIthVal(xValues[i*VAL_SIZE + j] , j);
+    }
+  }
+
+  unsigned int superHeight = ceil(log2(superNodes.size()) / log2(CHILD_SIZE)) + 1;
+  SuperTree superTree(superHeight);
+  superTree.buildBottomUpBTree(superNodes);
+  SuperNode superRoot = superTree.getRoot();
+  cout << "\n:" <<  superRoot;
   return 0;
 }

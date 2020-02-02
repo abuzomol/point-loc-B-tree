@@ -5,6 +5,8 @@
 #include "Tree.h"
 
 #include <algorithm>
+#include <cmath>
+
 using namespace std;
 
 Tree::Tree(const int& height) { tree.resize(height); }
@@ -15,16 +17,26 @@ void Tree::buildBottomUpBTree(const vector<Node>& nodes, const bool &direction)
   cout << "\n height: " << height;
   Tree::tree[height - 1] = nodes;
 
-  /*//check if last element is underflow
-  int last = nodes.size()-1;
-  if(Tree::tree[height-1].size() > 1  && Tree::tree[height - 1][last].underflow() )
+  //check if last element is underflow
+  int last = Tree::tree[height-1].size()-1;
+  if( (last >= 1)  && Tree::tree[height-1][last].underflow())
   {
-    if(last >= 1 )
+    int mid = ceil(Tree::tree[height - 1][last-1].getValSize() / 2.0);
+    vector<LineSegment> *temp = new vector<LineSegment>() ;
+    temp->resize(Tree::tree[height - 1][last-1].getValSize() - mid + Tree::tree[height - 1][last].getValSize());
+    //copy the elements from previous node to last node
+    for(int i = mid; i < Tree::tree[height - 1][last-1].getValSize() ; i++ )
     {
-      int mid =
-          (Tree::tree[height - 1][nodes.size() - 2].getValSize() + Tree::tree[height - 1][last].getValSize() )/ 2;
+      (*temp)[i-mid] =  Tree::tree[height - 1][last-1].getIthVal(i);
     }
-  }*/
+    //copy all elements from last node
+    for(int i = 0; i < Tree::tree[height - 1][last].getValSize() ; i++ )
+    {
+      (*temp)[i+ Tree::tree[height - 1][last-1].getValSize() - mid ] =  Tree::tree[height - 1][last].getIthVal(i);
+    }
+    Tree::tree[height-1][last-1].setValSize(mid);
+    Tree::tree[height-1][last].setVal(*temp);
+  }
   // go over every level in the tree
   for (int i = height - 2; i > -1; --i)
   {

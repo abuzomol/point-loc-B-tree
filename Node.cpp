@@ -46,9 +46,9 @@ void Node::setIthMinMaxX(const double& minMax, const int& i)
 }
 
 const Node* Node::getIthChild(int& i) const { return child[i]; }
-void Node::setIthChild(Node& node, int& i) { Node::child[i] = &node; }
+void Node::setIthChild(Node& node,const int& i) { Node::child[i] = &node; }
 
-const bool &  Node::underflow() const
+const bool Node::underflow() const
 {
   return Node::getValSize() < MIN_VAL;
 }
