@@ -50,6 +50,8 @@ const SuperNode* SuperNode::getIthChild(const int & i)
   return SuperNode::child[i];
 }
 
+const unsigned int SuperNode::getValSize() const{return SuperNode::val.size();}
+
 std::ostream& operator<<(std::ostream& os, const SuperNode& superNode)
 {
   for (int i = 0; i < superNode.val.size(); ++i)

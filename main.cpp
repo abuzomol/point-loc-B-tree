@@ -95,5 +95,6 @@ int main()
   superTree.buildBottomUpBTree(superNodes);
   SuperNode superRoot = superTree.getRoot();
   cout << "\n:" <<  superRoot;
+  fillSuperTree(superRoot, lineSegmentsY);
   return 0;
 }

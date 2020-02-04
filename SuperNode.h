@@ -42,10 +42,9 @@ class SuperNode
   const SuperNode* getIthChild(const int & i);
 
   friend std::ostream& operator<<(std::ostream& os, const SuperNode& superNode);
+  const unsigned int getValSize() const;
 };
 
 std::ostream& operator<<(std::ostream& os, const SuperNode& superNode);
-
-void fillSuperTree(std::set<LineSegment, YLeftLessThan>& lineSegments);
 
 #endif // POINT_LOC_B_TREE_SUPERNODE_H

@@ -15,8 +15,8 @@ class SuperTree
  public:
   SuperTree(const int& height);
   void buildBottomUpBTree(const std::vector<SuperNode>& nodes);
-  void fillSuperTree(std::set<LineSegment, YLeftLessThan>& lineSegments);
   const SuperNode& getRoot() const;
 };
 
+void fillSuperTree(SuperNode& superRoot, std::set<LineSegment, YLeftLessThan>& lineSegments);
 #endif  // POINT_LOC_B_TREE_SUPERTREE_H

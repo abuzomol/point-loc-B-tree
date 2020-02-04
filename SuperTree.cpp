@@ -57,9 +57,78 @@ void SuperTree::buildBottomUpBTree(const std::vector<SuperNode>& nodes)
   }
 }
 
-void fillSuperTree(std::set<LineSegment, YLeftLessThan>& lineSegments)
+//check superRoot is not null
+void fillSuperTree(SuperNode& superRoot,std::set<LineSegment, YLeftLessThan>& lineSegments)
 {
+  vector< set<LineSegment, YLeftLessThan>* >* left = new vector< set<LineSegment, YLeftLessThan>* >(superRoot.getValSize());
+  vector< set<LineSegment, YLeftLessThan>* >* right = new vector< set<LineSegment, YLeftLessThan>* >(superRoot.getValSize());
+  vector< set<LineSegment, YLeftLessThan>*  >* remainingLineSegments = new vector< set<LineSegment, YLeftLessThan>* >(superRoot.getValSize()+1);
 
+  set<LineSegment, YLeftLessThan>* middle = new set<LineSegment, YLeftLessThan>();
+
+
+  //for loop that scan every line segment and produce, left, middle and right structure of nodes
+  for(auto it = lineSegments.begin(); it != lineSegments.end() ; it++ )
+  {
+    //loop through node values
+    for(int i = 0; i < superRoot.getValSize(); i++)
+    {
+      //if the lineSegment crosses boundary i
+      if (it->getXLeft() <= superRoot.getIthVal(i) && it->getXRight() > superRoot.getIthVal(i) )
+      {
+        //to the left of first boundary
+        if(i ==0 && it->getXLeft() < superRoot.getIthVal(i))
+        {
+          (*left)[i]->insert(*it);
+        }
+        //starts at slab i-1
+        if (i > 0 && it->getXLeft()  > superRoot.getIthVal(i-1) && it->getXLeft() < superRoot.getIthVal(i) )
+        {
+          (*left)[i]->insert(*it);
+        }
+        //to the right of last boundary
+        if (i == superRoot.getValSize()-1 )
+        {
+          (*right)[i]->insert(*it);
+        }
+        //ends at slab i
+        if (i < superRoot.getValSize()-1 && it->getXRight()  < superRoot.getIthVal(i+1) )
+        {
+          (*right)[i]->insert(*it);
+        }
+        //case lineSegment crosses a slab
+        if (i < superRoot.getValSize()-1 && it->getXRight()  >= superRoot.getIthVal(i+1) )
+        {
+          middle->insert(*it);
+        }
+      }
+      //case it does not cross any boundary
+      else
+      {
+        //case it ends before first boundary
+        if(i == 0 && (*it).getXRight() < superRoot.getIthVal(0))
+        {
+          (*remainingLineSegments)[i]->insert(*it);
+        }
+        //case it ends after last boundary
+        if(i == superRoot.getValSize()-1 && (*it).getXRight() > superRoot.getIthVal(i))
+        {
+          (*remainingLineSegments)[i+1]->insert(*it);
+        }
+        //case it is between two boundaries i and i +1
+        if (i > 0  && (*it).getXLeft() < superRoot.getIthVal(i -1 ) &&  (*it).getXRight() < superRoot.getIthVal(i) )
+        {
+          (*remainingLineSegments)[i]->insert(*it);
+        }
+
+      }
+    }
+    //case left is not empty
+    if (!left->empty())
+    {
+
+    }
+  }
 }
 
 const SuperNode& SuperTree::getRoot() const
