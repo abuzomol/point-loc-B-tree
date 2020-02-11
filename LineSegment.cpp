@@ -3,8 +3,10 @@
 //
 
 #include "LineSegment.h"
+
 #include <cmath>
 #include <iostream>
+
 #include "global_const.h"
 
 double LineSegment::getXLeft() const { return xLeft; }
@@ -28,4 +30,3 @@ std::ostream& operator<<(std::ostream& os, const LineSegment lineSegment)
      << ')';
   return os;
 }
-

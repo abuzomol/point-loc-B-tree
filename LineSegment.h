@@ -9,10 +9,10 @@
 
 class LineSegment
 {
-private:
+ private:
   double xLeft, xRight, yLeft, yRight;
 
-public:
+ public:
   // assume for now all coordinates are positives
   LineSegment() : xLeft(-1), xRight(-1), yLeft(-1), yRight(-1) {}
   LineSegment(double xLeft, double xRight, double yLeft, double yRight)
@@ -67,4 +67,4 @@ struct YRightLessThan
   }
 };
 
-#endif // POINT_LOC_B_TREE_LINESEGMENT_H
+#endif  // POINT_LOC_B_TREE_LINESEGMENT_H

@@ -30,7 +30,7 @@ void Node::setIthVal(const LineSegment& lineSegment, const int& i)
 {
   Node::val[i] = lineSegment;
 }
-const LineSegment& Node::getIthVal(const int& i) const {return Node::val[i];}
+const LineSegment& Node::getIthVal(const int& i) const { return Node::val[i]; }
 void Node::setValSize(const unsigned int& valSize)
 {
   Node::val.resize(valSize);
@@ -46,16 +46,10 @@ void Node::setIthMinMaxX(const double& minMax, const int& i)
 }
 
 const Node* Node::getIthChild(int& i) const { return child[i]; }
-void Node::setIthChild(Node& node,const int& i) { Node::child[i] = &node; }
+void Node::setIthChild(Node& node, const int& i) { Node::child[i] = &node; }
 
-const bool Node::underflow() const
-{
-  return Node::getValSize() < MIN_VAL;
-}
-const unsigned int Node::getValSize() const
-{
-  return Node::val.size();
-}
+const bool Node::underflow() const { return Node::getValSize() < MIN_VAL; }
+const unsigned int Node::getValSize() const { return Node::val.size(); }
 
 std::ostream& operator<<(std::ostream& os, const Node& node)
 {

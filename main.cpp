@@ -9,8 +9,8 @@
 #include "Node.h"
 #include "Point.h"
 #include "SuperNode.h"
-#include "Tree.h"
 #include "SuperTree.h"
+#include "Tree.h"
 
 using namespace std;
 
@@ -47,24 +47,24 @@ int main()
 
   // get all x coordinates from lineSegments
   vector<double> xValues;
-  xValues.resize(2*n);
-  for(int i = 0; i < n ; i ++)
+  xValues.resize(2 * n);
+  for (int i = 0; i < n; i++)
   {
     xValues[i << 1] = lineSegs[i].getXLeft();
-    xValues[(i << 1) + 1 ] = lineSegs[i].getXRight();
+    xValues[(i << 1) + 1] = lineSegs[i].getXRight();
   }
-  //sort xValues.
+  // sort xValues.
   sort(xValues.begin(), xValues.end());
-  //create the leaves nodes first
+  // create the leaves nodes first
   vector<Node> nodes;
-  unsigned int nodesTotal = ceil(n/VAL_SIZE);
+  unsigned int nodesTotal = ceil(n / VAL_SIZE);
   nodes.resize(nodesTotal);
   for (unsigned int i = 0; i < nodesTotal; i++)
   {
-    for(unsigned int j = 0; j < VAL_SIZE; j++)
+    for (unsigned int j = 0; j < VAL_SIZE; j++)
     {
-      nodes[i].setIthVal(lineSegs[i*VAL_SIZE + j] , j);
-      nodes[i].setIthMinMaxX(lineSegs[i*VAL_SIZE + j].getXLeft(), j);
+      nodes[i].setIthVal(lineSegs[i * VAL_SIZE + j], j);
+      nodes[i].setIthMinMaxX(lineSegs[i * VAL_SIZE + j].getXLeft(), j);
     }
   }
   for (int i = 0; i < nodesTotal; i++)
@@ -76,25 +76,26 @@ int main()
   Tree tree(height);
   tree.buildBottomUpBTree(nodes, true);
   Node root = tree.getRoot();
-  cout << "\n:" <<  root;
+  cout << "\n:" << root;
 
-  //construct the leaves of the superTree;
+  // construct the leaves of the superTree;
   vector<SuperNode> superNodes;
-  unsigned int superNodesTotal = ceil(2*n/VAL_SIZE);
+  unsigned int superNodesTotal = ceil(2 * n / VAL_SIZE);
   superNodes.resize(superNodesTotal);
   for (unsigned int i = 0; i < superNodesTotal; i++)
   {
-    for(unsigned int j = 0; j < VAL_SIZE; j++)
+    for (unsigned int j = 0; j < VAL_SIZE; j++)
     {
-      superNodes[i].setIthVal(xValues[i*VAL_SIZE + j] , j);
+      superNodes[i].setIthVal(xValues[i * VAL_SIZE + j], j);
     }
   }
 
-  unsigned int superHeight = ceil(log2(superNodes.size()) / log2(CHILD_SIZE)) + 1;
+  unsigned int superHeight =
+      ceil(log2(superNodes.size()) / log2(CHILD_SIZE)) + 1;
   SuperTree superTree(superHeight);
   superTree.buildBottomUpBTree(superNodes);
   SuperNode superRoot = superTree.getRoot();
-  cout << "\n:" <<  superRoot;
+  cout << "\n:" << superRoot;
   fillSuperTree(superRoot, lineSegmentsY);
-  return 0;
+       return 0;
 }

@@ -12,7 +12,7 @@ SuperNode::SuperNode()
   SuperNode::rightSemiLines = nullptr;
   SuperNode::middle = nullptr;
 }
-SuperNode::SuperNode(const std::vector<double>& val): val(val) {}
+SuperNode::SuperNode(const std::vector<double>& val) : val(val) {}
 
 const std::vector<double>& SuperNode::getVal() const { return val; }
 void SuperNode::setVal(const std::vector<double>& val) { SuperNode::val = val; }
@@ -34,23 +34,29 @@ void SuperNode::setChild(const std::vector<SuperNode*>& child)
   SuperNode::child = child;
 }
 
-void SuperNode::setIthVal(const double & val, const int& i)
+void SuperNode::setIthVal(const double& val, const int& i)
 {
   SuperNode::val[i] = val;
 }
-const double & SuperNode::getIthVal(const int& i) const{return SuperNode::val[i];}
+const double& SuperNode::getIthVal(const int& i) const
+{
+  return SuperNode::val[i];
+}
 
-void SuperNode::setIthChild(SuperNode &superNode, const int &i)
+void SuperNode::setIthChild(SuperNode& superNode, const int& i)
 {
   SuperNode::child[i] = &superNode;
 }
 
-const SuperNode* SuperNode::getIthChild(const int & i)
+const SuperNode* SuperNode::getIthChild(const int& i)
 {
   return SuperNode::child[i];
 }
 
-const unsigned int SuperNode::getValSize() const{return SuperNode::val.size();}
+const unsigned int SuperNode::getValSize() const
+{
+  return SuperNode::val.size();
+}
 
 std::ostream& operator<<(std::ostream& os, const SuperNode& superNode)
 {
@@ -59,4 +65,3 @@ std::ostream& operator<<(std::ostream& os, const SuperNode& superNode)
     os << superNode.val[i] << " ";
   }
 }
-
