@@ -8,24 +8,15 @@ SuperNode::SuperNode()
 {
   SuperNode::val.resize(VAL_SIZE);
   SuperNode::child.resize(CHILD_SIZE);
-  SuperNode::leftSemiLines = nullptr;
-  SuperNode::rightSemiLines = nullptr;
+  SuperNode::leftSemiLines.resize(VAL_SIZE);
+  SuperNode::rightSemiLines.resize(VAL_SIZE);
   SuperNode::middle = nullptr;
 }
 SuperNode::SuperNode(const std::vector<double>& val) : val(val) {}
 
 const std::vector<double>& SuperNode::getVal() const { return val; }
 void SuperNode::setVal(const std::vector<double>& val) { SuperNode::val = val; }
-Node* SuperNode::getLeftSemiLines() const { return leftSemiLines; }
-void SuperNode::setLeftSemiLines(Node* leftSemiLines)
-{
-  SuperNode::leftSemiLines = leftSemiLines;
-}
-Node* SuperNode::getRightSemiLines() const { return rightSemiLines; }
-void SuperNode::setRightSemiLines(Node* rightSemiLines)
-{
-  SuperNode::rightSemiLines = rightSemiLines;
-}
+
 MiddleNode* SuperNode::getMiddle() const { return middle; }
 void SuperNode::setMiddle(MiddleNode* middle) { SuperNode::middle = middle; }
 const std::vector<SuperNode*>& SuperNode::getChild() const { return child; }
@@ -57,6 +48,25 @@ const unsigned int SuperNode::getValSize() const
 {
   return SuperNode::val.size();
 }
+const Node* SuperNode::getIthLeftSemiLines(int &i)
+{
+  return SuperNode::leftSemiLines[i];
+}
+
+void SuperNode::setIthLeftSemiLines(Node & root, int &i )
+{
+  SuperNode::leftSemiLines[i] = &root;
+}
+
+const Node* SuperNode::getIthRightSemiLines(int &i)
+{
+  return SuperNode::rightSemiLines[i];
+}
+
+void SuperNode::setIthRightSemiLines(Node & root, int &i )
+{
+  SuperNode::leftSemiLines[i] = &root;
+}
 
 std::ostream& operator<<(std::ostream& os, const SuperNode& superNode)
 {
@@ -64,4 +74,20 @@ std::ostream& operator<<(std::ostream& os, const SuperNode& superNode)
   {
     os << superNode.val[i] << " ";
   }
+}
+const std::vector<Node*>& SuperNode::getLeftSemiLines() const
+{
+
+}
+void SuperNode::setLeftSemiLines(const std::vector<Node*>& leftSemiLines)
+{
+  SuperNode::leftSemiLines = leftSemiLines;
+}
+const std::vector<Node*>& SuperNode::getRightSemiLines() const
+{
+  return rightSemiLines;
+}
+void SuperNode::setRightSemiLines(const std::vector<Node*>& rightSemiLines)
+{
+  SuperNode::rightSemiLines = rightSemiLines;
 }
