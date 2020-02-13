@@ -86,4 +86,5 @@ void Tree::buildBottomUpBTree(const vector<Node>& nodes, const bool& direction)
     }
   }
 }
+
 const Node& Tree::getRoot() const { return Tree::tree[0][0]; }

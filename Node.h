@@ -42,6 +42,7 @@ class Node
   const unsigned int getValSize() const;
 
   const bool underflow() const;
+
   friend std::ostream& operator<<(std::ostream& os, const Node& node);
 };
 

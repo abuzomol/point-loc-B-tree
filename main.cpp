@@ -55,7 +55,7 @@ int main()
   }
   // sort xValues.
   sort(xValues.begin(), xValues.end());
-  // create the leaves nodes first
+  // create the leaves nodes first, N/B nodes
   vector<Node> nodes;
   unsigned int nodesTotal = ceil(n / VAL_SIZE);
   nodes.resize(nodesTotal);
@@ -97,5 +97,5 @@ int main()
   SuperNode superRoot = superTree.getRoot();
   cout << "\n:" << superRoot;
   fillSuperTree(superRoot, lineSegmentsY);
-       return 0;
+  return 0;
 }

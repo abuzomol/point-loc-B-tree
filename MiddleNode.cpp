@@ -4,12 +4,11 @@
 
 #include "MiddleNode.h"
 
-#include "Node.h"
 MiddleNode::MiddleNode()
 {
   MiddleNode::val.resize(VAL_SIZE);
   MiddleNode::child.resize(CHILD_SIZE);
- }
+}
 MiddleNode::MiddleNode(const std::vector<LineSegment>& val) : val(val)
 {
   MiddleNode::child.resize(CHILD_SIZE);
@@ -17,7 +16,7 @@ MiddleNode::MiddleNode(const std::vector<LineSegment>& val) : val(val)
 MiddleNode::MiddleNode(const std::vector<LineSegment>& val,
                        const std::vector<MiddleNode*>& child,
                        const unsigned int& spannedSlabs)
-    : val(val), child(child) , spannedSlabs(spannedSlabs)
+    : val(val), child(child), spannedSlabs(spannedSlabs)
 {
 }
 const std::vector<LineSegment>& MiddleNode::getVal() const { return val; }
@@ -40,6 +39,23 @@ const MiddleNode* MiddleNode::getIthChild(int& i) const { return child[i]; }
 void MiddleNode::setIthChild(MiddleNode& node, int& i)
 {
   MiddleNode::child[i] = &node;
+}
+
+const bool MiddleNode::underflow() const
+{
+  return MiddleNode::getValSize() < MIN_VAL;
+}
+const unsigned int MiddleNode::getValSize() const
+{
+  return MiddleNode::val.size();
+}
+const LineSegment& MiddleNode::getIthVal(const int& i) const
+{
+  return MiddleNode::val[i];
+}
+void MiddleNode::setValSize(const unsigned int& valSize)
+{
+  MiddleNode::val.resize(valSize);
 }
 
 std::ostream& operator<<(std::ostream& os, const MiddleNode& node)

@@ -7,8 +7,8 @@
 
 #include <ostream>
 #include <vector>
-
 #include "LineSegment.h"
+#include "global_const.h"
 
 // Val can store a double for y-value, but the total ordering of lineSegments
 // make it easier to use the lineSegment itself.
@@ -45,6 +45,10 @@ class MiddleNode
   void setIthVal(const LineSegment& lineSegment, const int& i);
   const MiddleNode* getIthChild(int& i) const;
   void setIthChild(MiddleNode& node, int& i);
+  const bool underflow() const;
+  const unsigned int getValSize() const;
+  const LineSegment& getIthVal(const int& i) const;
+  void setValSize(const unsigned int& valSize) ;
   friend std::ostream& operator<<(std::ostream& os, const MiddleNode& node);
 };
 

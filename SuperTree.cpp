@@ -162,14 +162,17 @@ void fillSuperTree(SuperNode& superRoot,
       // create the leaves nodes first
       vector<LineSegment>* lineSegs =
           new vector<LineSegment>((*left)[k]->size());
+
       auto itt = (*left)[k]->begin();
       for (int s = 0; s < (*left)[k]->size(); s++)
       {
         if (itt != (*left)[k]->end()) (*lineSegs)[s] = *itt;
+        itt++;
       }
       vector<Node>* nodes = new vector<Node>();
       unsigned int nodesTotal = ceil((*left)[k]->size() * 1.0 / VAL_SIZE);
       nodes->resize(nodesTotal);
+      cout << "total: " << nodesTotal << endl;
       for (unsigned int i = 0; i < nodesTotal; i++)
       {
         for (unsigned int j = 0; j < VAL_SIZE; j++)
@@ -182,6 +185,43 @@ void fillSuperTree(SuperNode& superRoot,
       unsigned int height = ceil(log2(nodes->size()) / log2(CHILD_SIZE)) + 1;
       Tree* tree = new Tree(height);
       tree->buildBottomUpBTree(*nodes, true);
+      Node root = tree->getRoot();
+      cout << "\nroot: " << k << " " << root;
+      superRoot.setIthLeftSemiLines(root, k);
+    }
+  }
+  // construct the right B-trees for each value of superRoot
+  for (int k = 0; k < superRoot.getValSize(); k++)
+  {
+    // case there are some nodes in the set left[i]
+    if (!(*right)[k]->empty())
+    {
+      // create the leaves nodes first
+      vector<LineSegment>* lineSegs =
+          new vector<LineSegment>((*right)[k]->size());
+
+      auto itt = (*right)[k]->begin();
+      for (int s = 0; s < (*right)[k]->size(); s++)
+      {
+        if (itt != (*right)[k]->end()) (*lineSegs)[s] = *itt;
+        itt++;
+      }
+      vector<Node>* nodes = new vector<Node>();
+      unsigned int nodesTotal = ceil((*right)[k]->size() * 1.0 / VAL_SIZE);
+      nodes->resize(nodesTotal);
+      cout << "total: " << nodesTotal << endl;
+      for (unsigned int i = 0; i < nodesTotal; i++)
+      {
+        for (unsigned int j = 0; j < VAL_SIZE; j++)
+        {
+          (*nodes)[i].setIthVal((*lineSegs)[i * VAL_SIZE + j], j);
+          (*nodes)[i].setIthMinMaxX((*lineSegs)[i * VAL_SIZE + j].getXLeft(),
+                                    j);
+        }
+      }
+      unsigned int height = ceil(log2(nodes->size()) / log2(CHILD_SIZE)) + 1;
+      Tree* tree = new Tree(height);
+      tree->buildBottomUpBTree(*nodes, false);
       Node root = tree->getRoot();
       cout << "\nroot: " << k << " " << root;
       superRoot.setIthLeftSemiLines(root, k);
