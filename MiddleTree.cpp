@@ -57,7 +57,7 @@ void MiddleTree::buildBottomUpBTree(const vector<MiddleNode>& nodes)
           {
             MiddleTree::tree[i][j].setIthChild(MiddleTree::tree[i + 1][j * CHILD_SIZE + k],
                                          k);
-            // DO XOR HERE  
+            // DO XOR HERE
           }
           // set up the values (skip every node with index multiple of
           // CHILD_SIZE)
