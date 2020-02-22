@@ -9,11 +9,11 @@
 
 using namespace std;
 
-Tree::Tree(const int& height) { tree.resize(height); }
+Tree::Tree(const int& height) { Tree::tree.resize(height); }
 
-void Tree::buildBottomUpBTree(const vector<Node>& nodes, const bool& direction)
+Tree::Tree(const int& height ,const vector<Node>& nodes, const bool& direction)
 {
-  int height = Tree::tree.size();
+  Tree::tree.resize(height);
   Tree::tree[height - 1] = nodes;
 
   if (Tree::tree.size() > 1)

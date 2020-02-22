@@ -5,16 +5,14 @@
 #include "SuperTree.h"
 
 #include <cmath>
-
 #include "Tree.h"
 using namespace std;
 
 SuperTree::SuperTree(const int& height) { superTree.resize(height); }
-void SuperTree::buildBottomUpBTree(const std::vector<SuperNode>& nodes)
+SuperTree::SuperTree(const int& height, const std::vector<SuperNode>& nodes)
 {
-  int height = SuperTree::superTree.size();
+  superTree.resize(height);
   SuperTree::superTree[height - 1] = nodes;
-
   /*//check if last element is underflow
   int last = nodes.size()-1;
   if(Tree::tree[height-1].size() > 1  && Tree::tree[height -
@@ -34,7 +32,7 @@ void SuperTree::buildBottomUpBTree(const std::vector<SuperNode>& nodes)
                    ? SuperTree::superTree[i + 1].size() / CHILD_SIZE
                    : (SuperTree::superTree[i + 1].size() / CHILD_SIZE) + 1;
 
-    cout << "\nsize: " << size;
+    //cout << "\nsize: " << size;
     SuperTree::superTree[i].resize(size);
     // go over every node in each level
     for (int j = 0; j < SuperTree::superTree[i].size(); j++)
@@ -156,37 +154,35 @@ void fillSuperTree(SuperNode& superRoot,
   // construct the left B-trees for each value of superRoot
   for (int k = 0; k < superRoot.getValSize(); k++)
   {
-    // case there are some nodes in the set left[i]
+    // case there are some lineSegments in the set left[k]
     if (!(*left)[k]->empty())
     {
       // create the leaves nodes first
-      vector<LineSegment>* lineSegs =
-          new vector<LineSegment>((*left)[k]->size());
-
-      auto itt = (*left)[k]->begin();
-      for (int s = 0; s < (*left)[k]->size(); s++)
-      {
-        if (itt != (*left)[k]->end()) (*lineSegs)[s] = *itt;
-        itt++;
-      }
-      vector<Node>* nodes = new vector<Node>();
+      vector<LineSegment>* lineSegs = new vector<LineSegment> ((*left)[k]->begin(), (*left)[k]->end());
       unsigned int nodesTotal = ceil((*left)[k]->size() * 1.0 / VAL_SIZE);
-      nodes->resize(nodesTotal);
-      cout << "total: " << nodesTotal << endl;
-      for (unsigned int i = 0; i < nodesTotal; i++)
+
+      vector<Node*> *nodes = new vector<Node*> (nodesTotal);
+
+      for(int i = 0 ; i < nodesTotal ; i++)
       {
+        (*nodes)[i] = new Node();
         for (unsigned int j = 0; j < VAL_SIZE; j++)
         {
-          (*nodes)[i].setIthVal((*lineSegs)[i * VAL_SIZE + j], j);
-          (*nodes)[i].setIthMinMaxX((*lineSegs)[i * VAL_SIZE + j].getXLeft(),
-                                    j);
+          (*nodes)[i]->getIthVal(((*lineSegs)[i * VAL_SIZE + j], j));
+          (*nodes)[i]->setIthMinMaxX((*lineSegs)[i * VAL_SIZE + j].getXLeft(),
+                                     j);
         }
       }
+
       unsigned int height = ceil(log2(nodes->size()) / log2(CHILD_SIZE)) + 1;
-      Tree* tree = new Tree(height);
-      tree->buildBottomUpBTree(*nodes, true);
+      Tree* tree = new Tree(height, *nodes, true);
+      
+
+
+
+     // tree->Tree(*nodes, true);
       Node root = tree->getRoot();
-      cout << "\nroot: " << k << " " << root;
+      //cout << "\nroot: " << k << " " << root;
       superRoot.setIthLeftSemiLines(root, k);
     }
   }
@@ -209,7 +205,7 @@ void fillSuperTree(SuperNode& superRoot,
       vector<Node>* nodes = new vector<Node>();
       unsigned int nodesTotal = ceil((*right)[k]->size() * 1.0 / VAL_SIZE);
       nodes->resize(nodesTotal);
-      cout << "total: " << nodesTotal << endl;
+      //cout << "total: " << nodesTotal << endl;
       for (unsigned int i = 0; i < nodesTotal; i++)
       {
         for (unsigned int j = 0; j < VAL_SIZE; j++)
@@ -221,10 +217,10 @@ void fillSuperTree(SuperNode& superRoot,
       }
       unsigned int height = ceil(log2(nodes->size()) / log2(CHILD_SIZE)) + 1;
       Tree* tree = new Tree(height);
-      tree->buildBottomUpBTree(*nodes, false);
-      Node root = tree->getRoot();
-      cout << "\nroot: " << k << " " << root;
-      superRoot.setIthLeftSemiLines(root, k);
+      //tree->Tree(*nodes, false);
+      //Node root = tree->getRoot();
+      //cout << "\nroot: " << k << " " << root;
+      //superRoot.setIthLeftSemiLines(root, k);
     }
   }
 }

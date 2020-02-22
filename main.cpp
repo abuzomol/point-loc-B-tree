@@ -71,13 +71,7 @@ int main()
   {
     cout << "\n" << nodes[i];
   }
-
-  unsigned int height = ceil(log2(nodes.size()) / log2(CHILD_SIZE)) + 1;
-  Tree tree(height);
-  tree.buildBottomUpBTree(nodes, true);
-  Node root = tree.getRoot();
-  cout << "\n:" << root;
-
+  // construct the leaves of the superTree;
   // construct the leaves of the superTree;
   vector<SuperNode> superNodes;
   unsigned int superNodesTotal = ceil(2 * n / VAL_SIZE);
@@ -92,10 +86,10 @@ int main()
 
   unsigned int superHeight =
       ceil(log2(superNodes.size()) / log2(CHILD_SIZE)) + 1;
-  SuperTree superTree(superHeight);
-  superTree.buildBottomUpBTree(superNodes);
+  SuperTree superTree(superHeight, superNodes);
   SuperNode superRoot = superTree.getRoot();
   cout << "\n:" << superRoot;
   fillSuperTree(superRoot, lineSegmentsY);
+  //cout << superRoot;
   return 0;
 }

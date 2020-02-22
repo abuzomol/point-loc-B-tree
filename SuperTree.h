@@ -14,7 +14,7 @@ class SuperTree
 
  public:
   SuperTree(const int& height);
-  void buildBottomUpBTree(const std::vector<SuperNode>& nodes);
+  SuperTree(const int& height, const std::vector<SuperNode>& nodes);
   const SuperNode& getRoot() const;
 };
 

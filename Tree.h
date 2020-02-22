@@ -17,7 +17,7 @@ class Tree
 
  public:
   Tree(const int& height);
-  void buildBottomUpBTree(const std::vector<Node>& nodes, const bool& direction);
+  Tree(const int& height ,const std::vector<Node>& nodes, const bool& direction);
   void fillTree(std::set<LineSegment, YLeftLessThan>& lineSegments);
   const Node& getRoot() const;
 };
