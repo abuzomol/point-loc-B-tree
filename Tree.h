@@ -5,9 +5,6 @@
 #ifndef POINT_LOC_B_TREE_TREE_H
 #define POINT_LOC_B_TREE_TREE_H
 
-#include <vector>
-#include <set>
-#include <iostream>
 #include "Node.h"
 
 class Tree
@@ -17,8 +14,8 @@ class Tree
 
  public:
   Tree(const int& height);
-  Tree(const int& height ,const std::vector<Node>& nodes, const bool& direction);
-  void fillTree(std::set<LineSegment, YLeftLessThan>& lineSegments);
+  Tree(const int& height, const std::vector<Node*>& nodes, const bool& direction);
+  void fillTree(const std::vector<LineSegment>& lineSegments);
   const Node& getRoot() const;
 };
 

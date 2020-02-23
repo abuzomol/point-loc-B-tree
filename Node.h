@@ -6,7 +6,6 @@
 #define POINT_LOC_B_TREE_NODE_H
 
 #include <algorithm>
-#include <ostream>
 #include <vector>
 #include "LineSegment.h"
 #include "global_const.h"
@@ -23,9 +22,9 @@ class Node
 
  public:
   Node();
-  Node(const std::vector<LineSegment>& val);
-  Node(const std::vector<LineSegment>& val,
-       const std::vector<Node*>& child,
+  explicit Node(std::vector<LineSegment>  val);
+  Node(std::vector<LineSegment>  val,
+       std::vector<Node*>  child,
        std::vector<double>& minMaxX);
   const std::vector<LineSegment>& getVal() const;
   void setVal(const std::vector<LineSegment>& val);
@@ -43,7 +42,7 @@ class Node
 
   const bool underflow() const;
 
-  friend std::ostream& operator<<(std::ostream& os, const Node& node);
+  friend std::ostream &operator<<(std::ostream& os, const Node& node);
 };
 
 std::ostream& operator<<(std::ostream& os, const Node& node);

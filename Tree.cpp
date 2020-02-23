@@ -11,10 +11,18 @@ using namespace std;
 
 Tree::Tree(const int& height) { Tree::tree.resize(height); }
 
-Tree::Tree(const int& height ,const vector<Node>& nodes, const bool& direction)
+Tree::Tree(const int& height ,const vector<Node*>& nodes, const bool& direction)
 {
   Tree::tree.resize(height);
-  Tree::tree[height - 1] = nodes;
+
+  //copy all nodes into leaves
+
+  for(auto& node : nodes )
+  {
+      Tree::tree[height-1].push_back(*node);
+  }
+
+//  Tree::tree[height - 1] = nodes;
 
   if (Tree::tree.size() > 1)
   {
@@ -23,7 +31,7 @@ Tree::Tree(const int& height ,const vector<Node>& nodes, const bool& direction)
     if ((last >= 1) && Tree::tree[height - 1][last].underflow())
     {
       int mid = ceil(Tree::tree[height - 1][last - 1].getValSize() / 2.0);
-      vector<LineSegment>* temp = new vector<LineSegment>();
+      auto* temp = new vector<LineSegment>();
       temp->resize(Tree::tree[height - 1][last - 1].getValSize() - mid
                    + Tree::tree[height - 1][last].getValSize());
       // copy the elements from previous node to last node

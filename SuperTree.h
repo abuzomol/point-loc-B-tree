@@ -5,18 +5,20 @@
 #ifndef POINT_LOC_B_TREE_SUPERTREE_H
 #define POINT_LOC_B_TREE_SUPERTREE_H
 
-#include <vector>
 #include "SuperNode.h"
-class SuperTree
-{
- private:
-  std::vector< std::vector<SuperNode> > superTree;
 
- public:
-  SuperTree(const int& height);
-  SuperTree(const int& height, const std::vector<SuperNode>& nodes);
-  const SuperNode& getRoot() const;
+class SuperTree {
+private:
+    std::vector<std::vector<SuperNode> > superTree;
+
+public:
+    SuperTree(const int &height);
+
+    SuperTree(const int &height, const std::vector<SuperNode> &nodes);
+
+    const SuperNode &getRoot() const;
 };
 
-void fillSuperTree(SuperNode& superRoot, std::set<LineSegment, YLeftLessThan>& lineSegments);
+void fillSuperTree(SuperNode &superRoot, std::vector<LineSegment> &lineSegments);
+
 #endif  // POINT_LOC_B_TREE_SUPERTREE_H

@@ -64,4 +64,5 @@ std::ostream& operator<<(std::ostream& os, const MiddleNode& node)
   {
     os << node.val[i] << " ";
   }
+  return os;
 }
