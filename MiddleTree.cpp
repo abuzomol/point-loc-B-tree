@@ -10,9 +10,8 @@ using namespace std;
 
 MiddleTree::MiddleTree(const int& height) { tree.resize(height); }
 
-void MiddleTree::buildBottomUpBTree(const vector<MiddleNode>& nodes)
+MiddleTree::MiddleTree(const int & height, const vector<int>& val,  const vector<MiddleNode>& nodes)
 {
-  int height = MiddleTree::tree.size();
   MiddleTree::tree[height - 1] = nodes;
 
   if (MiddleTree::tree.size() > 1)
@@ -22,7 +21,7 @@ void MiddleTree::buildBottomUpBTree(const vector<MiddleNode>& nodes)
     if ((last >= 1) && MiddleTree::tree[height - 1][last].underflow())
     {
       int mid = ceil(MiddleTree::tree[height - 1][last - 1].getValSize() / 2.0);
-      vector<LineSegment>* temp = new vector<LineSegment>();
+      auto* temp = new vector<LineSegment>();
       temp->resize(MiddleTree::tree[height - 1][last - 1].getValSize() - mid
                    + MiddleTree::tree[height - 1][last].getValSize());
       // copy the elements from previous node to last node

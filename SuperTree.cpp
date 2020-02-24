@@ -5,6 +5,7 @@
 #include "SuperTree.h"
 #include <cmath>
 #include "Tree.h"
+#include "MiddleTree.h"
 
 using namespace std;
 
@@ -63,6 +64,10 @@ void fillSuperTree(SuperNode &superRoot,
             new vector<vector<LineSegment> *>(superRoot.getValSize());
     auto *right =
             new vector<vector<LineSegment> *>(superRoot.getValSize());
+    //initialize the middle in the heap. Middle is connected to SuperNode parent.
+    auto *middle =
+            new vector<LineSegment*>();
+    //initialize the remainingLineSegments that left out from left, right, and middle
     auto *remainingLineSegments =
             new vector<vector<LineSegment> *>(superRoot.getValSize() + 1);
 
@@ -74,9 +79,6 @@ void fillSuperTree(SuperNode &superRoot,
 
     //initialize the last child to an empty vector
     (*remainingLineSegments)[superRoot.getValSize()] =
-            new vector<LineSegment>();
-    //initialize the middle in the heap. Middle is connected to SuperNode parent.
-    auto *middle =
             new vector<LineSegment>();
 
     // loop through node values and produce, left, middle and right and
@@ -117,7 +119,7 @@ void fillSuperTree(SuperNode &superRoot,
                     && lineSegment.getXRight() >= superRoot.getIthVal(i + 1)) {
 
                     if (find(middle->begin(), middle->end(), lineSegment) != middle->end()) {
-                        middle->push_back(lineSegment);
+                        middle->push_back(&lineSegment);
                     }
                 }
             }
@@ -143,77 +145,98 @@ void fillSuperTree(SuperNode &superRoot,
     }
     // construct the left B-trees for each value of superRoot
 
-  for (int k = 0; k < superRoot.getValSize(); k++)
-  {
-    // case there are some lineSegments in the set left[k]
-    if (!(*left)[k]->empty())
-    {
-      // create the leaves nodes first
-      unsigned int nodesTotal = ceil((*left)[k]->size() * 1.0 / VAL_SIZE);
-      auto *nodes = new vector<Node*> (nodesTotal);
+    for (int k = 0; k < superRoot.getValSize(); k++) {
+        // case there are some lineSegments in the set left[k]
+        if (!(*left)[k]->empty()) {
+            // create the leaves nodes first
+            unsigned int nodesTotal = ceil((*left)[k]->size() * 1.0 / VAL_SIZE);
+            auto *nodes = new vector<Node *>(nodesTotal);
 
-      for(int i = 0 ; i < nodesTotal ; i++)
-      {
-        (*nodes)[i] = new Node();
+            for (int i = 0; i < nodesTotal; i++) {
+                (*nodes)[i] = new Node();
+                for (int j = 0; j < VAL_SIZE; j++) {
+                    if (i * VAL_SIZE + j < (*left)[k]->size()) {
+                        (*nodes)[i]->setIthVal(*((*left)[k]->begin() + i * VAL_SIZE + j), j);
+                        (*nodes)[i]->setIthMinMaxX(((*left)[k]->begin() + i * VAL_SIZE + j)->getXLeft(),
+                                                   j);
+                    }
+                }
+            }
+
+            unsigned int height = ceil(log2(nodes->size()) / log2(CHILD_SIZE)) + 1;
+
+            Tree *tree = new Tree(height, *nodes, true);
+            // tree->Tree(*nodes, true);
+            Node root = tree->getRoot();
+            cout << "\nleft root: " << k << " " << root;
+            superRoot.setIthLeftSemiLines(root, k);
+        }
+    }
+
+    // construct the right B-trees for each value of superRoot
+
+    for (int k = 0; k < superRoot.getValSize(); k++)
+    {
+        // case there are some lineSegments in the set left[k]
+        if (!(*right)[k]->empty())
+        {
+            // create the leaves nodes first
+            unsigned int nodesTotal = ceil((*right)[k]->size() * 1.0 / VAL_SIZE);
+            auto *nodes = new vector<Node*> (nodesTotal);
+
+            for(int i = 0 ; i < nodesTotal ; i++)
+            {
+                (*nodes)[i] = new Node();
+                for (int j = 0; j < VAL_SIZE; j++)
+                {
+                    if ( i*VAL_SIZE + j < (*left)[k]->size() ) {
+                        (*nodes)[i]->setIthVal(*((*right)[k]->begin() + i * VAL_SIZE + j), j);
+                        (*nodes)[i]->setIthMinMaxX(((*right)[k]->begin() + i * VAL_SIZE + j)->getXRight(),
+                                                   j);
+                    }
+                }
+            }
+
+            unsigned int height = ceil(log2(nodes->size()) / log2(CHILD_SIZE)) + 1;
+
+            Tree* tree = new Tree(height, *nodes, false);
+            // tree->Tree(*nodes, true);
+            Node root = tree->getRoot();
+            cout << "\nright root: " << k << " " << root;
+            superRoot.setIthRightSemiLines(root, k);
+        }
+    }
+    // construct the middle B-trees
+    unsigned int middleNodesTotal = ceil(middle->size() * 1.0 / VAL_SIZE);
+    cout <<"middle size: " << middleNodesTotal;
+    auto *middleNodes = new vector<MiddleNode *>(middleNodesTotal);
+
+    //fill in the leaves first
+    //loop every middleNode
+
+    for(int i = 0; i < middleNodesTotal ; i++)
+    {
+        (*middleNodes)[i] = new MiddleNode();
+        unsigned int spannedSlabs = 0;
+        //loop over the middleNode val
         for (int j = 0; j < VAL_SIZE; j++)
         {
-            if ( i*VAL_SIZE + j < (*left)[k]->size() ) {
-                (*nodes)[i]->setIthVal(*((*left)[k]->begin() + i * VAL_SIZE + j), j);
-                (*nodes)[i]->setIthMinMaxX(((*left)[k]->begin() + i * VAL_SIZE + j)->getXLeft(),
-                                           j);
-            }         
+            if ( i*VAL_SIZE + j < middle->size() ) {
+                (*middleNodes)[i]->setIthVal(*(*middle)[ i * VAL_SIZE + j], j);
+                //or the spannedSlabs if lineSegment crosses slab j
+                if (j < VAL_SIZE - 1 &&  (*middle)[i * VAL_SIZE + j]->getXLeft() <= superRoot.getIthVal(j) && superRoot.getIthVal(j+1) <= (*middle)[i * VAL_SIZE + j]->getXLeft()  ){
+                    spannedSlabs |= (1 << j);
+                }
+            }
         }
-      }
-
-      unsigned int height = ceil(log2(nodes->size()) / log2(CHILD_SIZE)) + 1;
-
-      Tree* tree = new Tree(height, *nodes, true);
-        // tree->Tree(*nodes, true);
-      Node root = tree->getRoot();
-      cout << "\nroot: " << k << " " << root;
-      //superRoot.setIthLeftSemiLines(root, k);
-    }
-  }
-  // construct the right B-trees for each value of superRoot
-  /*
-  for (int k = 0; k < superRoot.getValSize(); k++)
-  {
-    // case there are some nodes in the set left[i]
-    if (!(*right)[k]->empty())
-    {
-      // create the leaves nodes first
-      vector<LineSegment>* lineSegs =
-          new vector<LineSegment>((*right)[k]->size());
-
-      auto itt = (*right)[k]->begin();
-      for (int s = 0; s < (*right)[k]->size(); s++)
-      {
-        if (itt != (*right)[k]->end()) (*lineSegs)[s] = *itt;
-        itt++;
-      }
-      vector<Node>* nodes = new vector<Node>();
-      unsigned int nodesTotal = ceil((*right)[k]->size() * 1.0 / VAL_SIZE);
-      nodes->resize(nodesTotal);
-      //cout << "total: " << nodesTotal << endl;
-      for (unsigned int i = 0; i < nodesTotal; i++)
-      {
-        for (unsigned int j = 0; j < VAL_SIZE; j++)
-        {
-          (*nodes)[i].setIthVal((*lineSegs)[i * VAL_SIZE + j], j);
-          (*nodes)[i].setIthMinMaxX((*lineSegs)[i * VAL_SIZE + j].getXLeft(),
-                                    j);
-        }
-      }
-      unsigned int height = ceil(log2(nodes->size()) / log2(CHILD_SIZE)) + 1;
-      Tree* tree = new Tree(height);
-      //tree->Tree(*nodes, false);
-      //Node root = tree->getRoot();
-      //cout << "\nroot: " << k << " " << root;
-      //superRoot.setIthLeftSemiLines(root, k);
+        (*middleNodes)[i]->setSpannedSlabs(spannedSlabs);
     }
 
-  }
-   */
+    cout <<"middle" <<endl;
+    for(int i= 0; i < middleNodes->size();i++)
+        cout << (*middleNodes)[i] <<" ";
+    //MiddleTree* middleTree = new MiddleTree();
 }
+
 
 const SuperNode &SuperTree::getRoot() const { return superTree[0][0]; }

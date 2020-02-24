@@ -11,7 +11,7 @@ using namespace std;
 
 Tree::Tree(const int& height) { Tree::tree.resize(height); }
 
-Tree::Tree(const int& height ,const vector<Node*>& nodes, const bool& direction)
+Tree::Tree(const int& height, const vector<Node*>& nodes, const bool& direction)
 {
   Tree::tree.resize(height);
 
