@@ -83,6 +83,8 @@ void fillSuperTree(SuperNode &superRoot,
 
     // loop through node values and produce, left, middle and right and
     // remainingLineSegments
+
+
     for (int i = 0; i < superRoot.getValSize(); i++) {
         // for loop that scan every line segment
         for (auto &lineSegment : lineSegments) {
@@ -91,9 +93,12 @@ void fillSuperTree(SuperNode &superRoot,
             if (lineSegment.getXLeft() <= superRoot.getIthVal(i)
                 && lineSegment.getXRight() >= superRoot.getIthVal(i)) {
                 // to the left of first boundary
+
+
                 if (i == 0 && lineSegment.getXLeft() < superRoot.getIthVal(i)) {
                     (*left)[i]->push_back(lineSegment);
                 }
+
 
                 // starts at slab i-1
                 if (i > 0 && lineSegment.getXLeft() > superRoot.getIthVal(i - 1)
@@ -106,22 +111,23 @@ void fillSuperTree(SuperNode &superRoot,
                     && lineSegment.getXRight() > superRoot.getIthVal(i)) {
                     (*right)[i]->push_back(lineSegment);
                 }
-                // ends at slab i
 
+                // ends at slab i
                 if (i < superRoot.getValSize() - 1
                     && lineSegment.getXRight() < superRoot.getIthVal(i + 1)
                     && lineSegment.getXRight() > superRoot.getIthVal(i)) {
                     (*right)[i]->push_back(lineSegment);
                 }
                 // case lineSegment crosses slab i
-
                 if (i < superRoot.getValSize() - 1
                     && lineSegment.getXRight() >= superRoot.getIthVal(i + 1)) {
 
-                    if (find(middle->begin(), middle->end(), lineSegment) != middle->end()) {
+                    if (find(middle->begin(), middle->end(), &lineSegment) == middle->end()) {
                         middle->push_back(&lineSegment);
                     }
+
                 }
+
             }
                 // case it does not cross any boundary
             else {
@@ -136,6 +142,7 @@ void fillSuperTree(SuperNode &superRoot,
                 }
                 // case it is between two boundaries i and i +1 i.e. b_i < left x <
                 // b_i+1
+
                 if (i > 0 && lineSegment.getXLeft() > superRoot.getIthVal(i - 1)
                     && lineSegment.getXRight() < superRoot.getIthVal(i)) {
                     (*remainingLineSegments)[i]->push_back(lineSegment);
@@ -144,7 +151,6 @@ void fillSuperTree(SuperNode &superRoot,
         }
     }
     // construct the left B-trees for each value of superRoot
-
     for (int k = 0; k < superRoot.getValSize(); k++) {
         // case there are some lineSegments in the set left[k]
         if (!(*left)[k]->empty()) {
@@ -206,6 +212,8 @@ void fillSuperTree(SuperNode &superRoot,
             superRoot.setIthRightSemiLines(root, k);
         }
     }
+
+
     // construct the middle B-trees
     unsigned int middleNodesTotal = ceil(middle->size() * 1.0 / VAL_SIZE);
     cout <<"middle size: " << middleNodesTotal;
@@ -213,7 +221,6 @@ void fillSuperTree(SuperNode &superRoot,
 
     //fill in the leaves first
     //loop every middleNode
-
     for(int i = 0; i < middleNodesTotal ; i++)
     {
         (*middleNodes)[i] = new MiddleNode();
@@ -232,10 +239,11 @@ void fillSuperTree(SuperNode &superRoot,
         (*middleNodes)[i]->setSpannedSlabs(spannedSlabs);
     }
 
-    cout <<"middle" <<endl;
+    cout <<"\nmiddle" <<endl;
     for(int i= 0; i < middleNodes->size();i++)
-        cout << (*middleNodes)[i] <<" ";
+        cout << *(*middleNodes)[i] <<" ";
     //MiddleTree* middleTree = new MiddleTree();
+
 }
 
 
