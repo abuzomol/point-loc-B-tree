@@ -10,11 +10,13 @@
 class MiddleTree
 {
  private:
-  std::vector< std::vector<MiddleNode> > tree;
+  std::vector<std::vector<MiddleNode> > tree;
 
  public:
   MiddleTree(const int& height);
-  MiddleTree(const int & height, const std::vector<int>& val,  const std::vector<MiddleNode>& nodes);
+  MiddleTree(const int& height,
+             const std::vector<int>& val,
+             const std::vector<MiddleNode>& nodes);
   void fillTree(std::vector<LineSegment>& lineSegments);
   const MiddleNode& getRoot() const;
 };

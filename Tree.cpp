@@ -15,14 +15,14 @@ Tree::Tree(const int& height, const vector<Node*>& nodes, const bool& direction)
 {
   Tree::tree.resize(height);
 
-  //copy all nodes into leaves
+  // copy all nodes into leaves
 
-  for(auto& node : nodes )
+  for (auto& node : nodes)
   {
-      Tree::tree[height-1].push_back(*node);
+    Tree::tree[height - 1].push_back(*node);
   }
 
-//  Tree::tree[height - 1] = nodes;
+  //  Tree::tree[height - 1] = nodes;
 
   if (Tree::tree.size() > 1)
   {

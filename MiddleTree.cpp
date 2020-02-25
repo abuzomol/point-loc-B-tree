@@ -2,15 +2,18 @@
 // Created by muzamil on 2/12/20.
 //
 
+#include "MiddleTree.h"
+
 #include <algorithm>
 #include <cmath>
-#include "MiddleTree.h"
 
 using namespace std;
 
 MiddleTree::MiddleTree(const int& height) { tree.resize(height); }
 
-MiddleTree::MiddleTree(const int & height, const vector<int>& val,  const vector<MiddleNode>& nodes)
+MiddleTree::MiddleTree(const int& height,
+                       const vector<int>& val,
+                       const vector<MiddleNode>& nodes)
 {
   MiddleTree::tree[height - 1] = nodes;
 
@@ -25,7 +28,8 @@ MiddleTree::MiddleTree(const int & height, const vector<int>& val,  const vector
       temp->resize(MiddleTree::tree[height - 1][last - 1].getValSize() - mid
                    + MiddleTree::tree[height - 1][last].getValSize());
       // copy the elements from previous node to last node
-      for (int i = mid; i < MiddleTree::tree[height - 1][last - 1].getValSize(); i++)
+      for (int i = mid; i < MiddleTree::tree[height - 1][last - 1].getValSize();
+           i++)
       {
         (*temp)[i - mid] = MiddleTree::tree[height - 1][last - 1].getIthVal(i);
       }
@@ -42,8 +46,8 @@ MiddleTree::MiddleTree(const int & height, const vector<int>& val,  const vector
     for (int i = height - 2; i > -1; --i)
     {
       int size = MiddleTree::tree[i + 1].size() % CHILD_SIZE == 0
-                 ? MiddleTree::tree[i + 1].size() / CHILD_SIZE
-                 : (MiddleTree::tree[i + 1].size() / CHILD_SIZE) + 1;
+                     ? MiddleTree::tree[i + 1].size() / CHILD_SIZE
+                     : (MiddleTree::tree[i + 1].size() / CHILD_SIZE) + 1;
 
       MiddleTree::tree[i].resize(size);
       // go over every node in each level
@@ -54,16 +58,18 @@ MiddleTree::MiddleTree(const int & height, const vector<int>& val,  const vector
         {
           if (j * CHILD_SIZE + k < MiddleTree::tree[i + 1].size())
           {
-            MiddleTree::tree[i][j].setIthChild(MiddleTree::tree[i + 1][j * CHILD_SIZE + k],
-                                         k);
+            MiddleTree::tree[i][j].setIthChild(
+                MiddleTree::tree[i + 1][j * CHILD_SIZE + k], k);
             // DO XOR HERE
           }
           // set up the values (skip every node with index multiple of
           // CHILD_SIZE)
-          if (k < VAL_SIZE && j * CHILD_SIZE + k < MiddleTree::tree[i + 1].size())
+          if (k < VAL_SIZE
+              && j * CHILD_SIZE + k < MiddleTree::tree[i + 1].size())
           {
             MiddleTree::tree[i][j].setIthVal(
-                MiddleTree::tree[i + 1][j * CHILD_SIZE + k].getVal()[VAL_SIZE - 1],
+                MiddleTree::tree[i + 1][j * CHILD_SIZE + k]
+                    .getVal()[VAL_SIZE - 1],
                 k);
           }
         }

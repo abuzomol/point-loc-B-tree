@@ -58,7 +58,10 @@ void MiddleNode::setValSize(const unsigned int& valSize)
   MiddleNode::val.resize(valSize);
 }
 
-void MiddleNode::setSpannedSlabs(unsigned int spannedSlabs) {MiddleNode::spannedSlabs = spannedSlabs; }
+void MiddleNode::setSpannedSlabs(unsigned int spannedSlabs)
+{
+  MiddleNode::spannedSlabs = spannedSlabs;
+}
 std::ostream& operator<<(std::ostream& os, const MiddleNode& node)
 {
   for (int i = 0; i < node.val.size(); ++i)
@@ -67,4 +70,3 @@ std::ostream& operator<<(std::ostream& os, const MiddleNode& node)
   }
   return os;
 }
-

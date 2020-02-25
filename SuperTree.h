@@ -7,18 +7,20 @@
 
 #include "SuperNode.h"
 
-class SuperTree {
-private:
-    std::vector<std::vector<SuperNode> > superTree;
+class SuperTree
+{
+ private:
+  std::vector<std::vector<SuperNode> > superTree;
 
-public:
-    SuperTree(const int &height);
+ public:
+  SuperTree(const int& height);
 
-    SuperTree(const int &height, const std::vector<SuperNode> &nodes);
+  SuperTree(const int& height, const std::vector<SuperNode>& nodes);
 
-    const SuperNode &getRoot() const;
+  const SuperNode& getRoot() const;
 };
 
-void fillSuperTree(SuperNode &superRoot, std::vector<LineSegment> &lineSegments);
+void fillSuperTree(SuperNode& superRoot,
+                   std::vector<LineSegment>& lineSegments);
 
 #endif  // POINT_LOC_B_TREE_SUPERTREE_H

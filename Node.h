@@ -7,6 +7,7 @@
 
 #include <algorithm>
 #include <vector>
+
 #include "LineSegment.h"
 #include "global_const.h"
 
