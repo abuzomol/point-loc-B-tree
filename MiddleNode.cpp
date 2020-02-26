@@ -70,3 +70,5 @@ std::ostream& operator<<(std::ostream& os, const MiddleNode& node)
   }
   return os;
 }
+
+unsigned int MiddleNode::getSpannedSlabs() const {return MiddleNode::spannedSlabs;}

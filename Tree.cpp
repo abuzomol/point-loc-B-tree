@@ -95,4 +95,4 @@ Tree::Tree(const int& height, const vector<Node*>& nodes, const bool& direction)
   }
 }
 
-const Node& Tree::getRoot() const { return Tree::tree[0][0]; }
+Node* Tree::getRoot() { return &(Tree::tree[0][0]); }

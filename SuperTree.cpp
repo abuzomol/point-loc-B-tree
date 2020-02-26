@@ -191,9 +191,9 @@ void fillSuperTree(SuperNode& superRoot, vector<LineSegment>& lineSegments)
 
       Tree* tree = new Tree(height, *nodes, true);
       // tree->Tree(*nodes, true);
-      Node root = tree->getRoot();
-      cout << "\nleft root: " << k << " " << root;
-      superRoot.setIthLeftSemiLines(root, k);
+      Node* root = tree->getRoot();
+      cout << "\nleft root: " << k << " " << *root;
+      superRoot.setIthLeftSemiLines(*root, k);
     }
   }
 
@@ -201,7 +201,7 @@ void fillSuperTree(SuperNode& superRoot, vector<LineSegment>& lineSegments)
 
   for (int k = 0; k < superRoot.getValSize(); k++)
   {
-    // case there are some lineSegments in the set left[k]
+    // case there are some lineSegments in the set right[k]
     if (!(*right)[k]->empty())
     {
       // create the leaves nodes first
@@ -213,7 +213,7 @@ void fillSuperTree(SuperNode& superRoot, vector<LineSegment>& lineSegments)
         (*nodes)[i] = new Node();
         for (int j = 0; j < VAL_SIZE; j++)
         {
-          if (i * VAL_SIZE + j < (*left)[k]->size())
+          if (i * VAL_SIZE + j < (*right)[k]->size())
           {
             (*nodes)[i]->setIthVal(*((*right)[k]->begin() + i * VAL_SIZE + j),
                                    j);
@@ -225,9 +225,9 @@ void fillSuperTree(SuperNode& superRoot, vector<LineSegment>& lineSegments)
       unsigned int height = ceil(log2(nodes->size()) / log2(CHILD_SIZE)) + 1;
       Tree* tree = new Tree(height, *nodes, false);
       // tree->Tree(*nodes, true);
-      Node root = tree->getRoot();
-      cout << "\nright root: " << k << " " << root;
-      superRoot.setIthRightSemiLines(root, k);
+      Node* root = tree->getRoot();
+      cout << "\nright root: " << k << " " << *root;
+      superRoot.setIthRightSemiLines(*root, k);
     }
   }
 
@@ -264,7 +264,9 @@ void fillSuperTree(SuperNode& superRoot, vector<LineSegment>& lineSegments)
   cout << "\nmiddle" << endl;
   for (int i = 0; i < middleNodes->size(); i++)
     cout << *(*middleNodes)[i] << " ";
-  // MiddleTree* middleTree = new MiddleTree();
+
+  unsigned int height = ceil(log2(middleNodes->size()) / log2(CHILD_SIZE)) + 1;
+  MiddleTree* middleTree = new MiddleTree(height, *middleNodes);
 }
 
 const SuperNode& SuperTree::getRoot() const { return superTree[0][0]; }

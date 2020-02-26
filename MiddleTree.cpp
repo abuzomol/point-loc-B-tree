@@ -11,11 +11,15 @@ using namespace std;
 
 MiddleTree::MiddleTree(const int& height) { tree.resize(height); }
 
-MiddleTree::MiddleTree(const int& height,
-                       const vector<int>& val,
-                       const vector<MiddleNode>& nodes)
+MiddleTree::MiddleTree(const unsigned int& height,
+                       const std::vector<MiddleNode*>& nodes)
 {
-  MiddleTree::tree[height - 1] = nodes;
+  MiddleTree::tree.resize(height);
+  //copy the leaves into the tree:
+  for (auto& node : nodes)
+  {
+    MiddleTree::tree[height - 1].push_back(*node);
+  }
 
   if (MiddleTree::tree.size() > 1)
   {
@@ -54,13 +58,16 @@ MiddleTree::MiddleTree(const int& height,
       for (int j = 0; j < MiddleTree::tree[i].size(); j++)
       {
         // set up the children
+        unsigned int spannedslabs = 0;
+
         for (int k = 0; k < CHILD_SIZE; k++)
         {
           if (j * CHILD_SIZE + k < MiddleTree::tree[i + 1].size())
           {
             MiddleTree::tree[i][j].setIthChild(
                 MiddleTree::tree[i + 1][j * CHILD_SIZE + k], k);
-            // DO XOR HERE
+            // Do the XOR here
+            spannedslabs |= MiddleTree::tree[i + 1][j * CHILD_SIZE + k].getSpannedSlabs();
           }
           // set up the values (skip every node with index multiple of
           // CHILD_SIZE)
@@ -73,6 +80,7 @@ MiddleTree::MiddleTree(const int& height,
                 k);
           }
         }
+        MiddleTree::tree[i][j].setSpannedSlabs(spannedslabs);
       }
     }
   }

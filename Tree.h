@@ -18,7 +18,7 @@ class Tree
        const std::vector<Node*>& nodes,
        const bool& direction);
   void fillTree(const std::vector<LineSegment>& lineSegments);
-  const Node& getRoot() const;
+  Node* getRoot();
 };
 
 #endif  // POINT_LOC_B_TREE_TREE_H

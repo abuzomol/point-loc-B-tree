@@ -14,9 +14,8 @@ class MiddleTree
 
  public:
   MiddleTree(const int& height);
-  MiddleTree(const int& height,
-             const std::vector<int>& val,
-             const std::vector<MiddleNode>& nodes);
+  MiddleTree(const unsigned int& height,
+             const std::vector<MiddleNode*>& nodes);
   void fillTree(std::vector<LineSegment>& lineSegments);
   const MiddleNode& getRoot() const;
 };
