@@ -17,7 +17,7 @@ class MiddleTree
   MiddleTree(const unsigned int& height,
              const std::vector<MiddleNode*>& nodes);
   void fillTree(std::vector<LineSegment>& lineSegments);
-  const MiddleNode& getRoot() const;
+  MiddleNode* getRoot();
 };
 
 #endif  // POINT_LOC_B_TREE_MIDDLETREE_H

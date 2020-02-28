@@ -106,7 +106,7 @@ void fillSuperTree(SuperNode& superRoot, vector<LineSegment>& lineSegments)
         }
 
         // starts at slab i-1
-        if (i > 0 && lineSegment.getXLeft() > superRoot.getIthVal(i - 1)
+        if (i > 0 &&  superRoot.getIthVal(i - 1) < lineSegment.getXLeft()
             && lineSegment.getXLeft() < superRoot.getIthVal(i))
         {
           (*left)[i]->push_back(lineSegment);
@@ -233,7 +233,6 @@ void fillSuperTree(SuperNode& superRoot, vector<LineSegment>& lineSegments)
 
   // construct the middle B-trees
   unsigned int middleNodesTotal = ceil(middle->size() * 1.0 / VAL_SIZE);
-  cout << "middle size: " << middleNodesTotal;
   auto* middleNodes = new vector<MiddleNode*>(middleNodesTotal);
 
   // fill in the leaves first
@@ -261,12 +260,15 @@ void fillSuperTree(SuperNode& superRoot, vector<LineSegment>& lineSegments)
     (*middleNodes)[i]->setSpannedSlabs(spannedSlabs);
   }
 
-  cout << "\nmiddle" << endl;
+  cout << "\nmiddle nodes:" << endl;
   for (int i = 0; i < middleNodes->size(); i++)
     cout << *(*middleNodes)[i] << " ";
 
   unsigned int height = ceil(log2(middleNodes->size()) / log2(CHILD_SIZE)) + 1;
   MiddleTree* middleTree = new MiddleTree(height, *middleNodes);
+  MiddleNode* middleRoot = middleTree->getRoot();
+  superRoot.setMiddle(middleRoot);
+  cout << "\nmiddle root: " << (*middleRoot);
 }
 
 const SuperNode& SuperTree::getRoot() const { return superTree[0][0]; }

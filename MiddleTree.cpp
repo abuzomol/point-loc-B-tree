@@ -86,4 +86,4 @@ MiddleTree::MiddleTree(const unsigned int& height,
   }
 }
 
-const MiddleNode& MiddleTree::getRoot() const { return MiddleTree::tree[0][0]; }
+MiddleNode* MiddleTree::getRoot() { return &MiddleTree::tree[0][0]; }
