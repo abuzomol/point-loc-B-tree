@@ -36,7 +36,7 @@ SuperTree::SuperTree(const int& height, const std::vector<SuperNode>& nodes)
                    ? SuperTree::superTree[i + 1].size() / CHILD_SIZE
                    : (SuperTree::superTree[i + 1].size() / CHILD_SIZE) + 1;
 
-    // cout << "\nsize: " << size;
+
     SuperTree::superTree[i].resize(size);
     // go over every node in each level
     for (int j = 0; j < SuperTree::superTree[i].size(); j++)
@@ -192,7 +192,7 @@ void fillSuperTree(SuperNode& superRoot, vector<LineSegment>& lineSegments)
       Tree* tree = new Tree(height, *nodes, true);
       // tree->Tree(*nodes, true);
       Node* root = tree->getRoot();
-      cout << "\nleft root: " << k << " " << *root;
+
       superRoot.setIthLeftSemiLines(*root, k);
     }
   }
@@ -226,7 +226,7 @@ void fillSuperTree(SuperNode& superRoot, vector<LineSegment>& lineSegments)
       Tree* tree = new Tree(height, *nodes, false);
       // tree->Tree(*nodes, true);
       Node* root = tree->getRoot();
-      cout << "\nright root: " << k << " " << *root;
+
       superRoot.setIthRightSemiLines(*root, k);
     }
   }
@@ -260,15 +260,10 @@ void fillSuperTree(SuperNode& superRoot, vector<LineSegment>& lineSegments)
     (*middleNodes)[i]->setSpannedSlabs(spannedSlabs);
   }
 
-  cout << "\nmiddle nodes:" << endl;
-  for (int i = 0; i < middleNodes->size(); i++)
-    cout << *(*middleNodes)[i] << " ";
-
   unsigned int height = ceil(log2(middleNodes->size()) / log2(CHILD_SIZE)) + 1;
   MiddleTree* middleTree = new MiddleTree(height, *middleNodes);
   MiddleNode* middleRoot = middleTree->getRoot();
   superRoot.setMiddle(middleRoot);
-  cout << "\nmiddle root: " << (*middleRoot);
 }
-
+const int SuperTree::size() const{return SuperTree::superTree.size();}
 const SuperNode& SuperTree::getRoot() const { return superTree[0][0]; }
