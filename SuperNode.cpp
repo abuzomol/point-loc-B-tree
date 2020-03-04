@@ -40,7 +40,7 @@ void SuperNode::setIthChild(SuperNode &superNode, const int &i) {
     SuperNode::child[i] = &superNode;
 }
 
-const SuperNode *SuperNode::getIthChild(const int &i) {
+SuperNode *SuperNode::getIthChild(const int &i) {
     return SuperNode::child[i];
 }
 

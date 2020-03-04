@@ -46,7 +46,7 @@ int main()
   fin.close();
 
   std::chrono::duration<double> elapsed = finish - start;
-  std::cout << "Time to read File        : " << elapsed.count() << " s\n";
+  std::cout << "Time to read File        : " << elapsed.count() / 1000<< " ms\n";
 
   // sort these lines by x-left
   sort(lineSegs.begin(), lineSegs.end(), XLeftLessThan());
@@ -85,14 +85,15 @@ int main()
   }*/
   // construct the leaves of the superTree;
   // construct the leaves of the superTree;
-  vector<SuperNode> superNodes;
+  vector<SuperNode*> superNodes;
   unsigned int superNodesTotal = ceil(2 * n / VAL_SIZE);
   superNodes.resize(superNodesTotal);
   for (unsigned int i = 0; i < superNodesTotal; i++)
   {
+    superNodes[i] = new SuperNode();
     for (unsigned int j = 0; j < VAL_SIZE; j++)
     {
-      superNodes[i].setIthVal(xValues[i * VAL_SIZE + j], j);
+      superNodes[i]->setIthVal(xValues[i * VAL_SIZE + j], j);
     }
   }
 
@@ -102,13 +103,23 @@ int main()
   SuperNode superRoot = superTree.getRoot();
   finish = std::chrono::high_resolution_clock::now();
   elapsed = finish - start;
-  std::cout << "Constructing the tree    : " << elapsed.count() << " s\n";
+  std::cout << "Constructing the tree    : " << elapsed.count() / 1000<< " ms\n";
+
+  //fill in itermediate <lineSeg*>
+  vector<LineSegment*> lineSegments;
+  for (auto& lineSeg : lineSegs )
+  {
+    lineSegments.push_back(&lineSeg);
+  }
 
   start = std::chrono::high_resolution_clock::now();
-  fillSuperTree(superRoot, lineSegs);
+
+  fillSuperTree(superRoot, lineSegments);
+
   finish = std::chrono::high_resolution_clock::now();
   elapsed = finish - start;
-  std::cout << "Filling the tree         : " << elapsed.count() << " s\n";
+
+  std::cout << "Filling the tree         : " << elapsed.count() / 1000<< " ms\n";
   cout <<"**************************************" <<endl;
   //Print information
   int zero = 0, one = 1, two = 2 ,three = 3, four = 4;

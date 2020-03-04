@@ -13,10 +13,13 @@ using namespace std;
 
 SuperTree::SuperTree(const int& height) { superTree.resize(height); }
 
-SuperTree::SuperTree(const int& height, const std::vector<SuperNode>& nodes)
+SuperTree::SuperTree(const int& height, const std::vector<SuperNode*>& nodes)
 {
   superTree.resize(height);
-  SuperTree::superTree[height - 1] = nodes;
+  for (auto& node : nodes)
+  {
+    SuperTree::superTree[height - 1].push_back(*node);
+  }
   /*//check if last element is underflow
   int last = nodes.size()-1;
   if(Tree::tree[height-1].size() > 1  && Tree::tree[height -
@@ -65,7 +68,7 @@ SuperTree::SuperTree(const int& height, const std::vector<SuperNode>& nodes)
 
 // check superRoot is not null
 
-void fillSuperTree(SuperNode& superRoot, vector<LineSegment>& lineSegments)
+void fillSuperTree(SuperNode& superRoot, vector<LineSegment*>& lineSegments)
 {
   auto* left = new vector<vector<LineSegment>*>(superRoot.getValSize());
   auto* right = new vector<vector<LineSegment>*>(superRoot.getValSize());
@@ -74,17 +77,17 @@ void fillSuperTree(SuperNode& superRoot, vector<LineSegment>& lineSegments)
   // initialize the remainingLineSegments that left out from left, right, and
   // middle
   auto* remainingLineSegments =
-      new vector<vector<LineSegment>*>(superRoot.getValSize() + 1);
+      new vector<vector<LineSegment*>*>(superRoot.getValSize() + 1);
 
   for (int i = 0; i < superRoot.getValSize(); i++)
   {
     (*left)[i] = new vector<LineSegment>();
     (*right)[i] = new vector<LineSegment>();
-    (*remainingLineSegments)[i] = new vector<LineSegment>();
+    (*remainingLineSegments)[i] = new vector<LineSegment*>();
   }
 
   // initialize the last child to an empty vector
-  (*remainingLineSegments)[superRoot.getValSize()] = new vector<LineSegment>();
+  (*remainingLineSegments)[superRoot.getValSize()] = new vector<LineSegment*>();
 
   // loop through node values and produce, left, middle and right and
   // remainingLineSegments
@@ -95,45 +98,46 @@ void fillSuperTree(SuperNode& superRoot, vector<LineSegment>& lineSegments)
     for (auto& lineSegment : lineSegments)
     {
       // if the lineSegment crosses or touches boundary i
-      if (lineSegment.getXLeft() <= superRoot.getIthVal(i)
-          && lineSegment.getXRight() >= superRoot.getIthVal(i))
+      if (lineSegment->getXLeft() <= superRoot.getIthVal(i)
+          && lineSegment->getXRight() >= superRoot.getIthVal(i))
       {
         // to the left of first boundary
 
-        if (i == 0 && lineSegment.getXLeft() < superRoot.getIthVal(i))
+        if (i == 0 && lineSegment->getXLeft() < superRoot.getIthVal(i))
         {
-          (*left)[i]->push_back(lineSegment);
+          (*left)[i]->push_back(*lineSegment);
         }
 
         // starts at slab i-1
-        if (i > 0 &&  superRoot.getIthVal(i - 1) < lineSegment.getXLeft()
-            && lineSegment.getXLeft() < superRoot.getIthVal(i))
+        if (i > 0 &&  superRoot.getIthVal(i - 1) < lineSegment->getXLeft()
+            && lineSegment->getXLeft() < superRoot.getIthVal(i))
         {
-          (*left)[i]->push_back(lineSegment);
+          (*left)[i]->push_back(*lineSegment);
         }
         // to the right of last boundary
 
         if (i == superRoot.getValSize() - 1
-            && lineSegment.getXRight() > superRoot.getIthVal(i))
+            && lineSegment->getXRight() > superRoot.getIthVal(i))
         {
-          (*right)[i]->push_back(lineSegment);
+          (*right)[i]->push_back(*lineSegment);
         }
 
         // ends at slab i
         if (i < superRoot.getValSize() - 1
-            && lineSegment.getXRight() < superRoot.getIthVal(i + 1)
-            && lineSegment.getXRight() > superRoot.getIthVal(i))
+            && lineSegment->getXRight() < superRoot.getIthVal(i + 1)
+            && lineSegment->getXRight() > superRoot.getIthVal(i))
         {
-          (*right)[i]->push_back(lineSegment);
+          (*right)[i]->push_back(*lineSegment);
         }
         // case lineSegment crosses slab i
         if (i < superRoot.getValSize() - 1
-            && lineSegment.getXRight() >= superRoot.getIthVal(i + 1))
+            && lineSegment->getXRight() >= superRoot.getIthVal(i + 1))
         {
-          if (find(middle->begin(), middle->end(), &lineSegment)
+          //check this for pointers
+          if (find(middle->begin(), middle->end(), lineSegment)
               == middle->end())
           {
-            middle->push_back(&lineSegment);
+            middle->push_back(lineSegment);
           }
         }
       }
@@ -141,21 +145,21 @@ void fillSuperTree(SuperNode& superRoot, vector<LineSegment>& lineSegments)
       else
       {
         // case it ends before first boundary
-        if (i == 0 && lineSegment.getXRight() < superRoot.getIthVal(i))
+        if (i == 0 && lineSegment->getXRight() < superRoot.getIthVal(i))
         {
           (*remainingLineSegments)[i]->push_back(lineSegment);
         }
         // case it starts after last boundary
         if (i == superRoot.getValSize() - 1
-            && lineSegment.getXLeft() > superRoot.getIthVal(i))
+            && lineSegment->getXLeft() > superRoot.getIthVal(i))
         {
           (*remainingLineSegments)[i + 1]->push_back(lineSegment);
         }
         // case it is between two boundaries i and i +1 i.e. b_i < left x <
         // b_i+1
 
-        if (i > 0 && lineSegment.getXLeft() > superRoot.getIthVal(i - 1)
-            && lineSegment.getXRight() < superRoot.getIthVal(i))
+        if (i > 0 && lineSegment->getXLeft() > superRoot.getIthVal(i - 1)
+            && lineSegment->getXRight() < superRoot.getIthVal(i))
         {
           (*remainingLineSegments)[i]->push_back(lineSegment);
         }
@@ -264,6 +268,14 @@ void fillSuperTree(SuperNode& superRoot, vector<LineSegment>& lineSegments)
   MiddleTree* middleTree = new MiddleTree(height, *middleNodes);
   MiddleNode* middleRoot = middleTree->getRoot();
   superRoot.setMiddle(middleRoot);
+  //recursive call for fill in the tree with remaining lineSegments
+  for(int i = 0; i < remainingLineSegments->size() ; i++)
+  {
+    if (!(*remainingLineSegments)[i]->empty() && superRoot.getIthChild(i) != nullptr)
+    {
+      fillSuperTree(*superRoot.getIthChild(i), *((*remainingLineSegments)[i]));
+    }
+  }
 }
 const int SuperTree::size() const{return SuperTree::superTree.size();}
 const SuperNode& SuperTree::getRoot() const { return superTree[0][0]; }

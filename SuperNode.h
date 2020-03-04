@@ -48,7 +48,7 @@ public:
 
     void setIthChild(SuperNode &superNode, const int &i);
 
-    const SuperNode *getIthChild(const int &i);
+    SuperNode *getIthChild(const int &i);
 
     friend std::ostream &operator<<(std::ostream &os, const SuperNode &superNode);
 

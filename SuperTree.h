@@ -14,12 +14,12 @@ class SuperTree
 
  public:
   SuperTree(const int& height);
-  SuperTree(const int& height, const std::vector<SuperNode>& nodes);
+  SuperTree(const int& height, const std::vector<SuperNode*>& nodes);
   const SuperNode& getRoot() const;
   const int size() const;
 };
 
 void fillSuperTree(SuperNode& superRoot,
-                   std::vector<LineSegment>& lineSegments);
+                   std::vector<LineSegment*>& lineSegments);
 
 #endif  // POINT_LOC_B_TREE_SUPERTREE_H
