@@ -9,6 +9,7 @@
 #include "MiddleTree.h"
 #include "Tree.h"
 
+LineSegment* pointLocationMiddle(MiddleNode* middleRoot, Point& point);
 using namespace std;
 
 SuperTree::SuperTree(const int& height) { superTree.resize(height); }
@@ -302,3 +303,16 @@ void fillSuperTree(SuperNode& superRoot, vector<LineSegment*>& lineSegments)
 }
 const int SuperTree::size() const { return SuperTree::superTree.size(); }
 const SuperNode& SuperTree::getRoot() const { return superTree[0][0]; }
+
+LineSegment* pointLocationQuery(SuperNode& superRoot, Point& point)
+{
+  LineSegment *ans = new LineSegment();
+  LineSegment *middleSegment;
+  middleSegment = pointLocationMiddle(superRoot.getMiddle(), point);
+  
+  return ans;
+}
+LineSegment* pointLocationMiddle(MiddleNode* middleRoot, Point& point)
+{
+  return nullptr;
+}

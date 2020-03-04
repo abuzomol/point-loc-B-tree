@@ -6,6 +6,7 @@
 #define POINT_LOC_B_TREE_SUPERTREE_H
 
 #include "SuperNode.h"
+#include "Point.h"
 
 class SuperTree
 {
@@ -22,4 +23,6 @@ class SuperTree
 void fillSuperTree(SuperNode& superRoot,
                    std::vector<LineSegment*>& lineSegments);
 
+LineSegment* pointLocationMiddle(MiddleNode* middleRoot, Point& point);
+LineSegment* pointLocationQuery(SuperNode& superRoot, Point& point);
 #endif  // POINT_LOC_B_TREE_SUPERTREE_H

@@ -15,7 +15,7 @@ MiddleTree::MiddleTree(const unsigned int& height,
                        const std::vector<MiddleNode*>& nodes)
 {
   MiddleTree::tree.resize(height);
-  //copy the leaves into the tree:
+  // copy the leaves into the tree:
   for (auto& node : nodes)
   {
     MiddleTree::tree[height - 1].push_back(*node);
@@ -67,7 +67,8 @@ MiddleTree::MiddleTree(const unsigned int& height,
             MiddleTree::tree[i][j].setIthChild(
                 MiddleTree::tree[i + 1][j * CHILD_SIZE + k], k);
             // Do the XOR here
-            spannedslabs |= MiddleTree::tree[i + 1][j * CHILD_SIZE + k].getSpannedSlabs();
+            spannedslabs |=
+                MiddleTree::tree[i + 1][j * CHILD_SIZE + k].getSpannedSlabs();
           }
           // set up the values (skip every node with index multiple of
           // CHILD_SIZE)
