@@ -39,7 +39,6 @@ SuperTree::SuperTree(const int& height, const std::vector<SuperNode*>& nodes)
                    ? SuperTree::superTree[i + 1].size() / CHILD_SIZE
                    : (SuperTree::superTree[i + 1].size() / CHILD_SIZE) + 1;
 
-
     SuperTree::superTree[i].resize(size);
     // go over every node in each level
     for (int j = 0; j < SuperTree::superTree[i].size(); j++)
@@ -68,30 +67,13 @@ SuperTree::SuperTree(const int& height, const std::vector<SuperNode*>& nodes)
 
 // check superRoot is not null
 
-void fillSuperTree(SuperNode& superRoot, vector<LineSegment*>& lineSegments)
+void partitionLineSegments(SuperNode& superRoot,
+                           vector<LineSegment*>& lineSegments,
+                           vector<vector<LineSegment>*>* left,
+                           vector<vector<LineSegment>*>* right,
+                           vector<LineSegment*>* middle,
+                           vector<vector<LineSegment*>*>* remainingLineSegments)
 {
-  auto* left = new vector<vector<LineSegment>*>(superRoot.getValSize());
-  auto* right = new vector<vector<LineSegment>*>(superRoot.getValSize());
-  // initialize the middle in the heap. Middle is connected to SuperNode parent.
-  auto* middle = new vector<LineSegment*>();
-  // initialize the remainingLineSegments that left out from left, right, and
-  // middle
-  auto* remainingLineSegments =
-      new vector<vector<LineSegment*>*>(superRoot.getValSize() + 1);
-
-  for (int i = 0; i < superRoot.getValSize(); i++)
-  {
-    (*left)[i] = new vector<LineSegment>();
-    (*right)[i] = new vector<LineSegment>();
-    (*remainingLineSegments)[i] = new vector<LineSegment*>();
-  }
-
-  // initialize the last child to an empty vector
-  (*remainingLineSegments)[superRoot.getValSize()] = new vector<LineSegment*>();
-
-  // loop through node values and produce, left, middle and right and
-  // remainingLineSegments
-
   for (int i = 0; i < superRoot.getValSize(); i++)
   {
     // for loop that scan every line segment
@@ -102,14 +84,12 @@ void fillSuperTree(SuperNode& superRoot, vector<LineSegment*>& lineSegments)
           && lineSegment->getXRight() >= superRoot.getIthVal(i))
       {
         // to the left of first boundary
-
         if (i == 0 && lineSegment->getXLeft() < superRoot.getIthVal(i))
         {
           (*left)[i]->push_back(*lineSegment);
         }
-
         // starts at slab i-1
-        if (i > 0 &&  superRoot.getIthVal(i - 1) < lineSegment->getXLeft()
+        if (i > 0 && superRoot.getIthVal(i - 1) < lineSegment->getXLeft()
             && lineSegment->getXLeft() < superRoot.getIthVal(i))
         {
           (*left)[i]->push_back(*lineSegment);
@@ -133,7 +113,7 @@ void fillSuperTree(SuperNode& superRoot, vector<LineSegment*>& lineSegments)
         if (i < superRoot.getValSize() - 1
             && lineSegment->getXRight() >= superRoot.getIthVal(i + 1))
         {
-          //check this for pointers
+          // check this for pointers
           if (find(middle->begin(), middle->end(), lineSegment)
               == middle->end())
           {
@@ -166,7 +146,11 @@ void fillSuperTree(SuperNode& superRoot, vector<LineSegment*>& lineSegments)
       }
     }
   }
-  // construct the left B-trees for each value of superRoot
+}
+
+void constructLeftTrees(SuperNode& superRoot,
+                        vector<vector<LineSegment>*>* left)
+{
   for (int k = 0; k < superRoot.getValSize(); k++)
   {
     // case there are some lineSegments in the set left[k]
@@ -200,9 +184,11 @@ void fillSuperTree(SuperNode& superRoot, vector<LineSegment*>& lineSegments)
       superRoot.setIthLeftSemiLines(*root, k);
     }
   }
+}
 
-  // construct the right B-trees for each value of superRoot
-
+void constructRightTrees(SuperNode& superRoot,
+                         vector<vector<LineSegment>*>* right)
+{
   for (int k = 0; k < superRoot.getValSize(); k++)
   {
     // case there are some lineSegments in the set right[k]
@@ -234,8 +220,10 @@ void fillSuperTree(SuperNode& superRoot, vector<LineSegment*>& lineSegments)
       superRoot.setIthRightSemiLines(*root, k);
     }
   }
+}
 
-  // construct the middle B-trees
+void constructMiddleTree(SuperNode& superRoot, vector<LineSegment*>* middle)
+{
   unsigned int middleNodesTotal = ceil(middle->size() * 1.0 / VAL_SIZE);
   auto* middleNodes = new vector<MiddleNode*>(middleNodesTotal);
 
@@ -268,14 +256,49 @@ void fillSuperTree(SuperNode& superRoot, vector<LineSegment*>& lineSegments)
   MiddleTree* middleTree = new MiddleTree(height, *middleNodes);
   MiddleNode* middleRoot = middleTree->getRoot();
   superRoot.setMiddle(middleRoot);
-  //recursive call for fill in the tree with remaining lineSegments
-  for(int i = 0; i < remainingLineSegments->size() ; i++)
+}
+
+void fillSuperTree(SuperNode& superRoot, vector<LineSegment*>& lineSegments)
+{
+  auto* left = new vector<vector<LineSegment>*>(superRoot.getValSize());
+  auto* right = new vector<vector<LineSegment>*>(superRoot.getValSize());
+  // initialize the middle in the heap. Middle is connected to SuperNode parent.
+  auto* middle = new vector<LineSegment*>();
+  // initialize the remainingLineSegments that left out from left, right, and
+  // middle
+  auto* remainingLineSegments =
+      new vector<vector<LineSegment*>*>(superRoot.getValSize() + 1);
+
+  for (int i = 0; i < superRoot.getValSize(); i++)
   {
-    if (!(*remainingLineSegments)[i]->empty() && superRoot.getIthChild(i) != nullptr)
+    (*left)[i] = new vector<LineSegment>();
+    (*right)[i] = new vector<LineSegment>();
+    (*remainingLineSegments)[i] = new vector<LineSegment*>();
+  }
+
+  // initialize the last child to an empty vector
+  (*remainingLineSegments)[superRoot.getValSize()] = new vector<LineSegment*>();
+
+  // loop through node values and produce, left, middle and right and
+  // remainingLineSegments
+  partitionLineSegments(
+      superRoot, lineSegments, left, right, middle, remainingLineSegments);
+
+  // construct the left B-trees for each value of superRoot
+  constructLeftTrees(superRoot, left);
+  // construct the right B-trees for each value of superRoot
+  constructRightTrees(superRoot, right);
+  // construct the middle B-trees
+  constructMiddleTree(superRoot, middle);
+  // recursive call for fill in the tree with remaining lineSegments
+  for (int i = 0; i < remainingLineSegments->size(); i++)
+  {
+    if (!(*remainingLineSegments)[i]->empty()
+        && superRoot.getIthChild(i) != nullptr)
     {
       fillSuperTree(*superRoot.getIthChild(i), *((*remainingLineSegments)[i]));
     }
   }
 }
-const int SuperTree::size() const{return SuperTree::superTree.size();}
+const int SuperTree::size() const { return SuperTree::superTree.size(); }
 const SuperNode& SuperTree::getRoot() const { return superTree[0][0]; }
