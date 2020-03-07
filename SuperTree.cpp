@@ -9,7 +9,6 @@
 #include "MiddleTree.h"
 #include "Tree.h"
 
-LineSegment* pointLocationMiddle(MiddleNode* middleRoot, Point& point);
 using namespace std;
 
 SuperTree::SuperTree(const int& height) { superTree.resize(height); }
@@ -304,15 +303,64 @@ void fillSuperTree(SuperNode& superRoot, vector<LineSegment*>& lineSegments)
 const int SuperTree::size() const { return SuperTree::superTree.size(); }
 const SuperNode& SuperTree::getRoot() const { return superTree[0][0]; }
 
-LineSegment* pointLocationQuery(SuperNode& superRoot, Point& point)
+const LineSegment* pointLocationQuery(SuperNode& superRoot, Point& point)
 {
-  LineSegment *ans = new LineSegment();
-  LineSegment *middleSegment;
-  middleSegment = pointLocationMiddle(superRoot.getMiddle(), point);
-  
+  LineSegment* ans = new LineSegment();
+
+  const LineSegment* middleSegment;
+  if (superRoot.getMiddle() != nullptr)
+  {
+    middleSegment = pointLocationMiddle(superRoot.getMiddle(), point);
+  }
+
+  auto low = lower_bound(
+      superRoot.getVal().begin(), superRoot.getVal().end(), point.getX());
+  int index = low - superRoot.getVal().begin();
+  cout << "\nlower bound: " << *low << " at position: " << index;
+  // case at the beginning when index = 0
+  if (index == 0 && superRoot.getIthLeftSemiLines(index) != nullptr)
+  {
+    const LineSegment* leftSegment =
+        pointLocationLeft(superRoot.getIthLeftSemiLines(index), point);
+    const LineSegment* segment =
+        pointLocationQuery(*superRoot.getIthChild(index), point);
+    if (middleSegment != nullptr)
+      return &max(*leftSegment,
+                  max(*middleSegment, *segment, YLeftLessThan()),
+                  YLeftLessThan());
+  }
+  // case at the end when index == root.val
+  else if (index == superRoot.getVal().size())
+  {
+    const LineSegment* rightSegment =
+        pointLocationLeft(superRoot.getIthRightSemiLines(index), point);
+    const LineSegment* segment =
+        pointLocationQuery(*superRoot.getIthChild(index + 1), point);
+    if (middleSegment != nullptr)
+      return &max(*rightSegment,
+                  max(*middleSegment, *segment, YLeftLessThan()),
+                  YLeftLessThan());
+  }
+  // case index in the middles
+  else
+  {
+    const LineSegment* leftSegment =
+        pointLocationLeft(superRoot.getIthLeftSemiLines(index), point);
+    const LineSegment* rightSegment =
+        pointLocationLeft(superRoot.getIthRightSemiLines(index), point);
+    const LineSegment* segment =
+        pointLocationQuery(*superRoot.getIthChild(index), point);
+    return &max(max(*leftSegment, *rightSegment, YLeftLessThan()),
+                max(*middleSegment, *segment, YLeftLessThan()),
+                YLeftLessThan());
+  }
   return ans;
 }
-LineSegment* pointLocationMiddle(MiddleNode* middleRoot, Point& point)
+const LineSegment* pointLocationLeft(const Node* root, Point& point)
+{
+  return nullptr;
+}
+const LineSegment* pointLocationMiddle(MiddleNode* middleRoot, Point& point)
 {
   return nullptr;
 }

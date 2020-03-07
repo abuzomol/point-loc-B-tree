@@ -6,9 +6,8 @@
 #define POINT_LOC_B_TREE_SUPERNODE_H
 
 #include <iostream>
-
-#include "MiddleNode.h"
 #include "Node.h"
+#include "MiddleNode.h"
 
 class SuperNode
 {

@@ -5,8 +5,8 @@
 #ifndef POINT_LOC_B_TREE_SUPERTREE_H
 #define POINT_LOC_B_TREE_SUPERTREE_H
 
-#include "SuperNode.h"
 #include "Point.h"
+#include "SuperNode.h"
 
 class SuperTree
 {
@@ -23,6 +23,8 @@ class SuperTree
 void fillSuperTree(SuperNode& superRoot,
                    std::vector<LineSegment*>& lineSegments);
 
-LineSegment* pointLocationMiddle(MiddleNode* middleRoot, Point& point);
-LineSegment* pointLocationQuery(SuperNode& superRoot, Point& point);
+const LineSegment* pointLocationMiddle(MiddleNode* middleRoot, Point& point);
+const LineSegment* pointLocationQuery(SuperNode& superRoot, Point& point);
+const LineSegment* pointLocationLeft(const Node* root, Point& point);
+
 #endif  // POINT_LOC_B_TREE_SUPERTREE_H

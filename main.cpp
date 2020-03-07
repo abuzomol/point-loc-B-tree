@@ -6,9 +6,9 @@
 #include <set>
 #include <vector>
 
-#include "MiddleNode.h"
-#include "Node.h"
 #include "Point.h"
+#include "Node.h"
+#include "MiddleNode.h"
 #include "SuperNode.h"
 #include "SuperTree.h"
 #include "Tree.h"
@@ -17,9 +17,9 @@ using namespace std;
 
 int main()
 {
-  ifstream fin("objects.1K.1583107550.long", ios::binary);
+  ifstream fin("objects.245187500.1583463015.long", ios::binary);
 
-  unsigned int n = 1000;
+  unsigned int n = 2451875;
   double xLeft, xRight, yLeft, yRight;
   char* memBlock = new char[sizeof(double) * 3];
   // fin >> n;
@@ -33,7 +33,7 @@ int main()
   for (unsigned int i = 0; i < n; i++)
   {
     // fin >> xLeft >>  xRight >> yLeft;
-    fin.read((char*)memBlock, sizeof(double) * 3);
+
     double* doubleBlock = (double*)memBlock;
     lineSegs[i].setXLeft(doubleBlock[0]);
     lineSegs[i].setXRight(doubleBlock[1]);
@@ -147,7 +147,7 @@ int main()
   point.setY(90000);
 
   cout<<"point: " <<point;
-  LineSegment* ans = pointLocationQuery(superRoot, point);
-  cout <<*ans;
+  //Iy const  LineSegment* ans = pointLocationQuery(superRoot, point);
+  //cout <<"\nLineSegment: " << *ans;
   return 0;
 }
