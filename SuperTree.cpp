@@ -332,18 +332,22 @@ const LineSegment* pointLocationQuery(SuperNode& superRoot, Point& point)
   // case at the end when index == root.val
   else if (index == superRoot.getVal().size())
   {
+
     const LineSegment* rightSegment =
         pointLocationLeft(superRoot.getIthRightSemiLines(index), point);
+    cout << "\n index +  1: " << index + 1 ;
     const LineSegment* segment =
         pointLocationQuery(*superRoot.getIthChild(index + 1), point);
     if (middleSegment != nullptr)
       return &max(*rightSegment,
                   max(*middleSegment, *segment, YLeftLessThan()),
                   YLeftLessThan());
+
   }
   // case index in the middles
   else
   {
+
     const LineSegment* leftSegment =
         pointLocationLeft(superRoot.getIthLeftSemiLines(index), point);
     const LineSegment* rightSegment =
@@ -353,6 +357,7 @@ const LineSegment* pointLocationQuery(SuperNode& superRoot, Point& point)
     return &max(max(*leftSegment, *rightSegment, YLeftLessThan()),
                 max(*middleSegment, *segment, YLeftLessThan()),
                 YLeftLessThan());
+
   }
   return ans;
 }

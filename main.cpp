@@ -19,7 +19,7 @@ int main()
 {
   ifstream fin("objects.245187500.1583463015.long", ios::binary);
 
-  unsigned int n = 2451875;
+  unsigned int n = 1000;
   double xLeft, xRight, yLeft, yRight;
   char* memBlock = new char[sizeof(double) * 3];
   // fin >> n;
@@ -147,7 +147,7 @@ int main()
   point.setY(90000);
 
   cout<<"point: " <<point;
-  //Iy const  LineSegment* ans = pointLocationQuery(superRoot, point);
-  //cout <<"\nLineSegment: " << *ans;
+  const  LineSegment* ans = pointLocationQuery(superRoot, point);
+  cout <<"\nLineSegment: " << *ans;
   return 0;
 }
