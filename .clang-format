@@ -16,6 +16,7 @@ BraceWrapping:
   BeforeElse: true
 BreakBeforeBraces: Custom
 DerivePointerAlignment: false
+IndentWidth: 4
 ---
 Language: Java
 BasedOnStyle:  Google
