@@ -25,7 +25,7 @@ int main() {
     unsigned int n = stoi(argv[1]);
     string fileName = argv[2];
     */
-    string fileName = "objects.12500K.1584034578.long";
+    string fileName = "objects.1K.1583107550.long";
     //unsigned int n = 10000000;
     unsigned int n = 1000;
 
@@ -37,7 +37,7 @@ int main() {
     // lineSegs.reserve(n);
 
     auto start = std::chrono::high_resolution_clock::now();
-    ifstream fin("objects.12500K.1584034578.long", ios::binary);
+    ifstream fin(fileName, ios::binary);
     for (unsigned int i = 0; i < n; i++) {
         // fin >> xLeft >>  xRight >> yLeft;
 
