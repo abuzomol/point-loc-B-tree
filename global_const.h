@@ -22,7 +22,7 @@
 // Took the numbers from /sys/devices/system/cpu/cpu*/cache
 // assuming 1 KB = 1000B
 
-#define OBJ_SIZE 32          // in bytes (4 words for now)
+#define OBJ_SIZE 24          // in bytes (3 words for now)
 #define RAM_SIZE 8137360000  // in bytes (over 7.5GB)
 #define L3_SIZE 6144000      // in bytes (6MB, L3 shared among all 4 cores)
 #define L2_SIZE 256000       // in bytes (L2 private to each of 4 cores)
@@ -39,10 +39,12 @@
 #define QUERY 2
 */
 
-#define B_SIZE 5
-#define CHILD_SIZE B_SIZE
-#define VAL_SIZE 4
+#define B_SIZE 4
+#define CHILD_SIZE (B_SIZE + 1)
+#define VAL_SIZE B_SIZE
 #define MIN_VAL 2
+#define BB_SIZE
+
 #define A_SIZE 2
 
 #endif // POINT_LOC_B_TREE_GLOBAL_CONST_H

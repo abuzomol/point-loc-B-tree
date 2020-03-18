@@ -26,5 +26,5 @@ void fillSuperTree(SuperNode& superRoot,
 const LineSegment* pointLocationMiddle(MiddleNode* middleRoot, Point& point);
 const LineSegment* pointLocationQuery(SuperNode& superRoot, Point& point);
 const LineSegment* pointLocationLeft(const Node* root, Point& point);
-
+const LineSegment* pointLocationRight(const Node* root, Point& point);
 #endif  // POINT_LOC_B_TREE_SUPERTREE_H

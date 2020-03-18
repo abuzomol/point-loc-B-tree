@@ -9,14 +9,14 @@
 
 class LineSegment {
 private:
-    double xLeft, xRight, yLeft, yRight;
+    double xLeft, xRight, yLeft;
 
 public:
     // assume for now all coordinates are positives
-    LineSegment() : xLeft(-1), xRight(-1), yLeft(-1), yRight(-1) {}
+    LineSegment() : xLeft(-1), xRight(-1), yLeft(-1) {}
 
     LineSegment(double xLeft, double xRight, double yLeft, double yRight)
-            : xLeft(xLeft), xRight(xRight), yLeft(yLeft), yRight(yRight) {
+            : xLeft(xLeft), xRight(xRight), yLeft(yLeft) {
     }
 
     double getXLeft() const;
