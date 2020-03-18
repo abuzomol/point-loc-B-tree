@@ -5,7 +5,6 @@
 #include <iostream>
 #include <set>
 #include <vector>
-
 #include "MiddleNode.h"
 #include "Node.h"
 #include "Point.h"
@@ -27,7 +26,7 @@ int main()
     */
     string fileName = "objects.1K.1583107550.long";
     // unsigned int n = 10000000;
-    unsigned int n = 1000;
+    unsigned int n = 10000000;
 
     // double xLeft, xRight, yLeft, yRight;
     char* memBlock = new char[sizeof(double) * 3];

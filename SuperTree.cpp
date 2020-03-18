@@ -361,13 +361,13 @@ const LineSegment* pointLocationQuery(SuperNode& superRoot, Point& point)
         {
             index--;
             rightSegment =
-                pointLocationRight(superRoot.getIthLeftSemiLines(index), point);
+                pointLocationRight(superRoot.getIthRightSemiLines(index), point);
             index++;
         }
         else  // if right border
         {
             rightSegment =
-                pointLocationRight(superRoot.getIthLeftSemiLines(index), point);
+                pointLocationRight(superRoot.getIthRightSemiLines(index), point);
         }
         // get the recursive segment
         if (superRoot.getIthChild(index) != nullptr)
@@ -382,16 +382,62 @@ const LineSegment* pointLocationQuery(SuperNode& superRoot, Point& point)
                     YLeftLessThan()),
                 YLeftLessThan());
 }
-
+//return the lineSegment that intersects point
 const LineSegment* pointLocationLeft(const Node* root, Point& point)
 {
-    auto segment = new LineSegment();
+    const LineSegment* segment = new LineSegment();
+    if (root == nullptr)
+        return segment;
+    LineSegment pointLineSegment(point.getX(), point.getX(), point.getY(), point.getY());
+    auto up = upper_bound(
+        root->getVal().begin(), root->getVal().end(), pointLineSegment, YLeftLessThan());
+    int index;
+    if (up != root->getVal().end())
+        index = up - root->getVal().begin();
+    else
+        index = root->getValSize();
+    while(root->getMinMaxX()[index] > point.getX() && index > 0)
+        index--;
+    //case there is an LineSegment intersecting the ray down
+    if(root->getMinMaxX()[index] <= point.getX())
+    {
+        //check the subTree to my right
+        segment = &max(*segment, *pointLocationLeft(root->getIthChild(index), point), YLeftLessThan());
+        //case nothing intersect within the sub-tree
+        if (segment->getYLeft() == -1  && root->getIthVal(index).getXLeft() <= point.getX())
+        {
+            segment = &root->getIthVal(index);
+        }
+    }
     return segment;
 }
 
 const LineSegment* pointLocationRight(const Node* root, Point& point)
 {
-    auto segment = new LineSegment();
+    const LineSegment* segment = new LineSegment();
+    if (root == nullptr)
+        return segment;
+    LineSegment pointLineSegment(point.getX(), point.getX(), point.getY(), point.getY());
+    auto up = upper_bound(
+        root->getVal().begin(), root->getVal().end(), pointLineSegment, YLeftLessThan());
+    int index;
+    if (up != root->getVal().end())
+        index = up - root->getVal().begin();
+    else
+        index = root->getValSize();
+    while(root->getMinMaxX()[index] < point.getX() && index > 0)
+        index--;
+    //case there is an LineSegment intersecting the ray down
+    if(root->getMinMaxX()[index] >= point.getX())
+    {
+        //check the subTree to my right
+        segment = &max(*segment, *pointLocationRight(root->getIthChild(index), point), YLeftLessThan());
+        //case nothing intersect within the sub-tree
+        if (segment->getYLeft() == -1  && root->getIthVal(index).getXRight() >= point.getX())
+        {
+            segment = &root->getIthVal(index);
+        }
+    }
     return segment;
 }
 

@@ -18,6 +18,7 @@ public:
     LineSegment(double xLeft, double xRight, double yLeft, double yRight)
             : xLeft(xLeft), xRight(xRight), yLeft(yLeft) {
     }
+    
 
     double getXLeft() const;
 
