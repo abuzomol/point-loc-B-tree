@@ -43,6 +43,8 @@
 #define CHILD_SIZE (B_SIZE + 1)
 #define VAL_SIZE B_SIZE
 #define MIN_VAL 2
+
+#define INFTY 9007199254740992
 #define BB_SIZE
 
 #define A_SIZE 2

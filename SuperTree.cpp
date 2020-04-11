@@ -303,7 +303,7 @@ void fillSuperTree(SuperNode& superRoot, vector<LineSegment*>& lineSegments)
     // construct the right B-trees for each value of superRoot
     constructRightTrees(superRoot, right);
     // construct the middle B-trees
-    constructMiddleTree(superRoot, middle);
+    constructMiddleTree(superRoot, middle); //ERROR HERE
     // recursive call for fill in the tree with remaining lineSegments
     for (int i = 0; i < remainingLineSegments->size(); i++)
     {
@@ -396,10 +396,10 @@ const LineSegment* pointLocationLeft(const Node* root, Point& point)
         index = up - root->getVal().begin();
     else
         index = root->getValSize();
-    while(root->getMinMaxX()[index] > point.getX() && index > 0)
+    while(root->getMinMaxX()[index] < point.getX() && index > 0)
         index--;
     //case there is an LineSegment intersecting the ray down
-    if(root->getMinMaxX()[index] <= point.getX())
+    if(root->getMinMaxX()[index] >= point.getX())
     {
         //check the subTree to my right
         segment = &max(*segment, *pointLocationLeft(root->getIthChild(index), point), YLeftLessThan());
@@ -425,10 +425,10 @@ const LineSegment* pointLocationRight(const Node* root, Point& point)
         index = up - root->getVal().begin();
     else
         index = root->getValSize();
-    while(root->getMinMaxX()[index] < point.getX() && index > 0)
+    while(root->getMinMaxX()[index] > point.getX() && index > 0)
         index--;
     //case there is an LineSegment intersecting the ray down
-    if(root->getMinMaxX()[index] >= point.getX())
+    if(root->getMinMaxX()[index] <= point.getX())
     {
         //check the subTree to my right
         segment = &max(*segment, *pointLocationRight(root->getIthChild(index), point), YLeftLessThan());

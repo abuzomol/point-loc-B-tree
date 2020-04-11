@@ -6,6 +6,7 @@
 #define POINT_LOC_B_TREE_LINESEGMENT_H
 
 #include <ostream>
+#include "global_const.h"
 
 class LineSegment {
 private:
@@ -18,7 +19,7 @@ public:
     LineSegment(double xLeft, double xRight, double yLeft, double yRight)
             : xLeft(xLeft), xRight(xRight), yLeft(yLeft) {
     }
-    
+
 
     double getXLeft() const;
 
