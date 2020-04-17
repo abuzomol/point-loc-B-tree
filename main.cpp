@@ -74,35 +74,10 @@ int main()
 
     start = std::chrono::high_resolution_clock::now();
 
-    // construct the leaves of the superTree
-    vector<SuperNode*> superNodes;
     unsigned int superNodesTotal = ceil(xValues.size() / VAL_SIZE);
-    superNodes.resize(superNodesTotal);
-    for (unsigned int i = 0; i < superNodesTotal; i++)
-    {
-        superNodes[i] = new SuperNode();
-        for (unsigned int j = 0; j < VAL_SIZE; j++)
-        {
-            if (i*VAL_SIZE + j < xValues.size())
-            {
-                superNodes[i]->setIthVal(xValues[i * VAL_SIZE + j], j);
-            }
-        }
-    }
-    //fill the last node with infinities if needed
-    if (xValues.size() % VAL_SIZE != 0)
-    {
-        int unfilled = VAL_SIZE - (xValues.size() % VAL_SIZE);
-        for (int i = 0; i < unfilled; i++)
-        {
-            superNodes[superNodes.size() - 1]->setIthVal(
-                INFTY, superNodes[0]->getValSize() - i - 1);
-        }
-    }
-
     unsigned int superHeight =
-        ceil(log2(superNodes.size()) / log2(CHILD_SIZE)) + 1;
-    SuperTree superTree(superHeight, superNodes);
+        ceil(log2(superNodesTotal) / log2(CHILD_SIZE)) + 1;
+    SuperTree superTree(superHeight, xValues);
     SuperNode superRoot = superTree.getRoot();
 
     finish = std::chrono::high_resolution_clock::now();

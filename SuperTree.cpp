@@ -13,25 +13,34 @@ using namespace std;
 
 SuperTree::SuperTree(const int& height) { superTree.resize(height); }
 
-SuperTree::SuperTree(const int& height, const std::vector<SuperNode*>& nodes)
+SuperTree::SuperTree(const int& height, const std::vector<double>& xValues)
 {
     superTree.resize(height);
-    for (auto& node : nodes)
+
+    // construct the leaves of the superTree
+    unsigned int superNodesTotal = ceil(xValues.size() / VAL_SIZE);
+    SuperTree::superTree[height-1].resize(superNodesTotal);
+    for (unsigned int i = 0; i < superNodesTotal; i++)
     {
-        SuperTree::superTree[height - 1].push_back(*node);
+        for (unsigned int j = 0; j < VAL_SIZE; j++)
+        {
+            if (i*VAL_SIZE + j < xValues.size())
+            {
+                SuperTree::superTree[height-1][i].setIthVal(xValues[i * VAL_SIZE + j], j);
+            }
+        }
     }
-    /*//check if last element is underflow
-    int last = nodes.size()-1;
-    if(Tree::tree[height-1].size() > 1  && Tree::tree[height -
-    1][last].underflow() )
+    //fill the last node with infinities if needed
+    if (xValues.size() % VAL_SIZE != 0)
     {
-      if(last >= 1 )
-      {
-        int mid =
-            (Tree::tree[height - 1][nodes.size() - 2].getValSize() +
-    Tree::tree[height - 1][last].getValSize() )/ 2;
-      }
-    }*/
+        int unfilled = VAL_SIZE - (xValues.size() % VAL_SIZE);
+        for (int i = 0; i < unfilled; i++)
+        {
+            SuperTree::superTree[height-1][superNodesTotal-1].setIthVal(
+                INFTY, VAL_SIZE - i - 1);
+        }
+    }
+
     // go over every level in the tree
     for (int i = height - 2; i > -1; --i)
     {
@@ -50,16 +59,27 @@ SuperTree::SuperTree(const int& height, const std::vector<SuperNode*>& nodes)
                 {
                     SuperTree::superTree[i][j].setIthChild(
                         SuperTree::superTree[i + 1][j * CHILD_SIZE + k], k);
+
+                    // set up the values (skip every node with index multiple of CHILD_SIZE)
+                    if (k - 1 > -1  )
+                    {
+                        SuperTree::superTree[i][j].setIthVal(
+                            SuperTree::superTree[i + 1][j * CHILD_SIZE + k - 1]
+                                .getVal()[VAL_SIZE - 1],
+                            k-1);
+                    }
                 }
-                // set up the values (skip every node with index multiple of
-                // CHILD_SIZE)
-                if (k < VAL_SIZE
-                    && j * CHILD_SIZE + k < SuperTree::superTree[i + 1].size())
+            }
+        }
+        //fill the last node with infinities if needed
+        if (SuperTree::superTree[i + 1].size() % CHILD_SIZE != 0)
+        {
+            int filled = SuperTree::superTree[i + 1].size() % CHILD_SIZE ;
+            if (filled - 1 > -1 )
+            {
+                for (int j = filled -1 ; j < VAL_SIZE; j++)
                 {
-                    SuperTree::superTree[i][j].setIthVal(
-                        SuperTree::superTree[i + 1][j * CHILD_SIZE + k]
-                            .getVal()[VAL_SIZE - 1],
-                        k);
+                    SuperTree::superTree[i][size - 1].setIthVal(INFTY, j);
                 }
             }
         }
@@ -299,11 +319,20 @@ void fillSuperTree(SuperNode& superRoot, vector<LineSegment*>& lineSegments)
         superRoot, lineSegments, left, right, middle, remainingLineSegments);
 
     // construct the left B-trees for each value of superRoot
-    constructLeftTrees(superRoot, left);
+    if (!left->empty())
+    {
+        constructLeftTrees(superRoot, left);
+    }
     // construct the right B-trees for each value of superRoot
-    constructRightTrees(superRoot, right);
+    if (!right->empty())
+    {
+        constructRightTrees(superRoot, right);
+    }
     // construct the middle B-trees
-    constructMiddleTree(superRoot, middle); //ERROR HERE
+    if (!middle->empty())
+    {
+        constructMiddleTree(superRoot, middle);  // ERROR HERE
+    }
     // recursive call for fill in the tree with remaining lineSegments
     for (int i = 0; i < remainingLineSegments->size(); i++)
     {
