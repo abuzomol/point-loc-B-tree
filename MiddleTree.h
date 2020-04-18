@@ -6,6 +6,7 @@
 #define POINT_LOC_B_TREE_MIDDLETREE_H
 
 #include "MiddleNode.h"
+#include "SuperNode.h"
 
 class MiddleTree
 {
@@ -14,7 +15,8 @@ class MiddleTree
 
  public:
   MiddleTree(const int& height);
-  MiddleTree(const unsigned int& height, const std::vector<MiddleNode*>& nodes);
+    MiddleTree(const unsigned int& height, SuperNode& superRoot,
+               const std::vector<LineSegment>& lineSegments);
   void fillTree(std::vector<LineSegment>& lineSegments);
   MiddleNode* getRoot();
 };

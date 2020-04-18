@@ -1,25 +1,46 @@
 //
 // Created by muzamil on 2/12/20.
 //
-
-#include "MiddleTree.h"
-
 #include <algorithm>
 #include <cmath>
+#include "MiddleTree.h"
 
 using namespace std;
 
 MiddleTree::MiddleTree(const int& height) { tree.resize(height); }
 
-MiddleTree::MiddleTree(const unsigned int& height,
-                       const std::vector<MiddleNode*>& nodes)
+MiddleTree::MiddleTree(const unsigned int& height, SuperNode& superRoot,
+                       const std::vector<LineSegment>& lineSegments)
 {
   MiddleTree::tree.resize(height);
   // copy the leaves into the tree:
-  for (auto& node : nodes)
-  {
-    MiddleTree::tree[height - 1].push_back(*node);
-  }
+  unsigned int nodesTotal = ceil(lineSegments.size()  / VAL_SIZE);
+
+  for (int i = 0; i < nodesTotal; i++)
+    {
+        MiddleNode* node = new MiddleNode();
+        unsigned int spannedSlabs = 0;
+
+        for (int j = 0; j < VAL_SIZE; j++)
+        {
+            if (i * VAL_SIZE + j < lineSegments.size())
+            {
+                node->setIthVal(
+                    lineSegments[i * VAL_SIZE + j], j);
+
+                if (j < VAL_SIZE - 1
+                    && lineSegments[i * VAL_SIZE + j].getXLeft()
+                       <= superRoot.getIthVal(j)
+                    && superRoot.getIthVal(j + 1)
+                       <= lineSegments[i * VAL_SIZE + j].getXLeft())
+                {
+                    spannedSlabs |= (1 << j);
+                }
+                node->setSpannedSlabs(spannedSlabs);
+            }
+        }
+        MiddleTree::tree[height-1].push_back(*node);
+    }
 
   if (MiddleTree::tree.size() > 1)
   {

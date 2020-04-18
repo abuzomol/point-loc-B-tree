@@ -120,3 +120,12 @@ int main()
     cout << "\nLineSegment: " << *ans;
     return 0;
 }
+/*
+point: (4211,90000)
+lower bound: 9.0072e+15 at position: 1
+lower bound: 5855.59 at position: 0
+lower bound: 5013.31 at position: 0
+lower bound: 4883.09 at position: 0
+lower bound: 4853 at position: 0
+LineSegment: (3437.35,6102.96)--(6086.25,6102.96)
+*/

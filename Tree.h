@@ -14,9 +14,7 @@ class Tree
 
  public:
   Tree(const int& height);
-  Tree(const int& height,
-       const std::vector<Node*>& nodes,
-       const bool& direction);
+  Tree(const int& height, const std::vector<LineSegment>& lineSegments, const bool& direction);
   void fillTree(const std::vector<LineSegment>& lineSegments);
   Node* getRoot();
 };

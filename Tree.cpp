@@ -11,18 +11,34 @@ using namespace std;
 
 Tree::Tree(const int& height) { Tree::tree.resize(height); }
 
-Tree::Tree(const int& height, const vector<Node*>& nodes, const bool& direction)
+Tree::Tree(const int& height, const vector<LineSegment>& lineSegments, const bool& direction)
 {
   Tree::tree.resize(height);
 
   // copy all nodes into leaves
 
-  for (auto& node : nodes)
+  /*for (auto& node : nodes)
   {
     Tree::tree[height - 1].push_back(*node);
-  }
+  }*/
 
-  //  Tree::tree[height - 1] = nodes;
+    unsigned int nodesTotal = ceil(lineSegments.size()  / VAL_SIZE);
+
+    for (int i = 0; i < nodesTotal; i++)
+    {
+        Node* node = new Node();
+        for (int j = 0; j < VAL_SIZE; j++)
+        {
+            if (i * VAL_SIZE + j < lineSegments.size())
+            {
+                node->setIthVal(
+                    lineSegments[i * VAL_SIZE + j], j);
+                node->setIthMinMaxX(lineSegments[i * VAL_SIZE + j].getXLeft(),
+                    j);
+            }
+        }
+        Tree::tree[height-1].push_back(*node);
+    }
 
   if (Tree::tree.size() > 1)
   {

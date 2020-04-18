@@ -92,7 +92,7 @@ void partitionLineSegments(SuperNode& superRoot,
                            vector<LineSegment*>& lineSegments,
                            vector<vector<LineSegment>*>* left,
                            vector<vector<LineSegment>*>* right,
-                           vector<LineSegment*>* middle,
+                           vector<LineSegment>* middle,
                            vector<vector<LineSegment*>*>* remainingLineSegments)
 {
     for (int i = 0; i < superRoot.getValSize(); i++)
@@ -136,10 +136,10 @@ void partitionLineSegments(SuperNode& superRoot,
                     && lineSegment->getXRight() >= superRoot.getIthVal(i + 1))
                 {
                     // check this for pointers
-                    if (find(middle->begin(), middle->end(), lineSegment)
+                    if (find(middle->begin(), middle->end(), *lineSegment)
                         == middle->end())
                     {
-                        middle->push_back(lineSegment);
+                        middle->push_back(*lineSegment);
                     }
                 }
             }
@@ -179,34 +179,10 @@ void constructLeftTrees(SuperNode& superRoot,
         // case there are some lineSegments in the set left[k]
         if (!(*left)[k]->empty())
         {
-            // create the leaves nodes first
-            unsigned int nodesTotal = ceil((*left)[k]->size() * 1.0 / VAL_SIZE);
-            auto* nodes = new vector<Node*>(nodesTotal);
-
-            for (int i = 0; i < nodesTotal; i++)
-            {
-                (*nodes)[i] = new Node();
-                for (int j = 0; j < VAL_SIZE; j++)
-                {
-                    if (i * VAL_SIZE + j < (*left)[k]->size())
-                    {
-                        (*nodes)[i]->setIthVal(
-                            *((*left)[k]->begin() + i * VAL_SIZE + j), j);
-                        (*nodes)[i]->setIthMinMaxX(
-                            ((*left)[k]->begin() + i * VAL_SIZE + j)
-                                ->getXLeft(),
-                            j);
-                    }
-                }
-            }
-
             unsigned int height =
-                ceil(log2(nodes->size()) / log2(CHILD_SIZE)) + 1;
-
-            Tree* tree = new Tree(height, *nodes, true);
-            // tree->Tree(*nodes, true);
+                ceil(log2((*left)[k]->size()) / log2(CHILD_SIZE)) + 1;
+            Tree* tree = new Tree(height,  *(*left)[k], true);
             Node* root = tree->getRoot();
-
             superRoot.setIthLeftSemiLines(*root, k);
         }
     }
@@ -221,71 +197,22 @@ void constructRightTrees(SuperNode& superRoot,
         if (!(*right)[k]->empty())
         {
             // create the leaves nodes first
-            unsigned int nodesTotal =
-                ceil((*right)[k]->size() * 1.0 / VAL_SIZE);
-            auto* nodes = new vector<Node*>(nodesTotal);
-
-            for (int i = 0; i < nodesTotal; i++)
-            {
-                (*nodes)[i] = new Node();
-                for (int j = 0; j < VAL_SIZE; j++)
-                {
-                    if (i * VAL_SIZE + j < (*right)[k]->size())
-                    {
-                        (*nodes)[i]->setIthVal(
-                            *((*right)[k]->begin() + i * VAL_SIZE + j), j);
-                        (*nodes)[i]->setIthMinMaxX(
-                            ((*right)[k]->begin() + i * VAL_SIZE + j)
-                                ->getXRight(),
-                            j);
-                    }
-                }
-            }
             unsigned int height =
-                ceil(log2(nodes->size()) / log2(CHILD_SIZE)) + 1;
-            Tree* tree = new Tree(height, *nodes, false);
-            // tree->Tree(*nodes, true);
+                ceil(log2((*right)[k]->size()) / log2(CHILD_SIZE)) + 1;
+            Tree* tree = new Tree(height, *(*right)[k], false);
             Node* root = tree->getRoot();
-
             superRoot.setIthRightSemiLines(*root, k);
         }
     }
 }
 
-void constructMiddleTree(SuperNode& superRoot, vector<LineSegment*>* middle)
+void constructMiddleTree(SuperNode& superRoot, vector<LineSegment>* middle)
 {
     unsigned int middleNodesTotal = ceil(middle->size() * 1.0 / VAL_SIZE);
-    auto* middleNodes = new vector<MiddleNode*>(middleNodesTotal);
-
-    // fill in the leaves first
-    // loop every middleNode
-    for (int i = 0; i < middleNodesTotal; i++)
-    {
-        (*middleNodes)[i] = new MiddleNode();
-        unsigned int spannedSlabs = 0;
-        // loop over the middleNode val
-        for (int j = 0; j < VAL_SIZE; j++)
-        {
-            if (i * VAL_SIZE + j < middle->size())
-            {
-                (*middleNodes)[i]->setIthVal(*(*middle)[i * VAL_SIZE + j], j);
-                // or the spannedSlabs if lineSegment crosses slab j
-                if (j < VAL_SIZE - 1
-                    && (*middle)[i * VAL_SIZE + j]->getXLeft()
-                           <= superRoot.getIthVal(j)
-                    && superRoot.getIthVal(j + 1)
-                           <= (*middle)[i * VAL_SIZE + j]->getXLeft())
-                {
-                    spannedSlabs |= (1 << j);
-                }
-            }
-        }
-        (*middleNodes)[i]->setSpannedSlabs(spannedSlabs);
-    }
 
     unsigned int height =
-        ceil(log2(middleNodes->size()) / log2(CHILD_SIZE)) + 1;
-    MiddleTree* middleTree = new MiddleTree(height, *middleNodes);
+        ceil(log2(middle->size()) / log2(CHILD_SIZE)) + 1;
+    MiddleTree* middleTree = new MiddleTree(height, superRoot,*middle);
     MiddleNode* middleRoot = middleTree->getRoot();
     superRoot.setMiddle(middleRoot);
 }
@@ -296,7 +223,7 @@ void fillSuperTree(SuperNode& superRoot, vector<LineSegment*>& lineSegments)
     auto* right = new vector<vector<LineSegment>*>(superRoot.getValSize());
     // initialize the middle in the heap. Middle is connected to SuperNode
     // parent.
-    auto* middle = new vector<LineSegment*>();
+    auto* middle = new vector<LineSegment>();
     // initialize the remainingLineSegments that left out from left, right, and
     // middle
     auto* remainingLineSegments =
@@ -313,8 +240,7 @@ void fillSuperTree(SuperNode& superRoot, vector<LineSegment*>& lineSegments)
     (*remainingLineSegments)[superRoot.getValSize()] =
         new vector<LineSegment*>();
 
-    // loop through node values and produce, left, middle and right and
-    // remainingLineSegments
+    //partition lineSegments into left, middle and right and remainingLineSegments
     partitionLineSegments(
         superRoot, lineSegments, left, right, middle, remainingLineSegments);
 
