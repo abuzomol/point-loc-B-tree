@@ -282,20 +282,24 @@ const LineSegment* pointLocationQuery(SuperNode& superRoot, Point& point)
     const LineSegment* rightSegment = new LineSegment();
     const LineSegment* recursiveSegment = new LineSegment();
 
-    // get the middleSegment if found
-    if (superRoot.getMiddle() != nullptr)
-    {
-        middleSegment = pointLocationMiddle(superRoot.getMiddle(), point);
-    }
-
+    //get the lower bound of x-values
     auto low = lower_bound(
         superRoot.getVal().begin(), superRoot.getVal().end(), point.getX());
+
     int index;
     if (low != superRoot.getVal().end())
         index = low - superRoot.getVal().begin();
     else
         index = superRoot.getValSize();
+
     cout << "\nlower bound: " << *low << " at position: " << index;
+
+    // get the middleSegment if found
+    if (superRoot.getMiddle() != nullptr)
+    {
+        middleSegment = pointLocationMiddle(superRoot.getMiddle(), point , index);
+    }
+
     // case the x value equals a boundary
     if (superRoot.getIthVal(index) == point.getX())
     {
@@ -343,14 +347,17 @@ const LineSegment* pointLocationLeft(const Node* root, Point& point)
     const LineSegment* segment = new LineSegment();
     if (root == nullptr)
         return segment;
+    //Dummy lineSegment to facilitate checking. Can be improved by a function call
     LineSegment pointLineSegment(point.getX(), point.getX(), point.getY(), point.getY());
     auto up = upper_bound(
         root->getVal().begin(), root->getVal().end(), pointLineSegment, YLeftLessThan());
+    //get the index of where this up lineSegment is located
     int index;
     if (up != root->getVal().end())
         index = up - root->getVal().begin();
     else
         index = root->getValSize();
+    //find a
     while(root->getMinMaxX()[index] < point.getX() && index > 0)
         index--;
     //case there is an LineSegment intersecting the ray down
@@ -396,8 +403,38 @@ const LineSegment* pointLocationRight(const Node* root, Point& point)
     return segment;
 }
 
-const LineSegment* pointLocationMiddle(MiddleNode* middleRoot, Point& point)
+
+// TO DO LIST Finish middle point location, and also finish the pointers usage from main.
+const LineSegment* pointLocationMiddle(const MiddleNode* root, Point& point, int& slabIndex)
 {
-    auto segment = new LineSegment();
+    const LineSegment* segment = new LineSegment();
+    //lower bound will return the val.size() if no element in the vector is less than point.x
+    if (root == nullptr || slabIndex == root->getValSize() )
+        return segment;
+    //get the slab index
+    unsigned int spanningFlag = 1 << slabIndex;
+    //get the upper bound for y
+    LineSegment pointLineSegment(point.getX(), point.getX(), point.getY(), point.getY());
+    auto up = upper_bound(
+        root->getVal().begin(), root->getVal().end(), pointLineSegment, YLeftLessThan());
+    int index;
+    if (up != root->getVal().end())
+        index = up - root->getVal().begin();
+    else
+        index = root->getValSize();
+    while(root->getIthChild(index)!= nullptr && root->getIthChild(index)->getSpannedSlabs() & spanningFlag != 0)
+        index--;
+
+    //case there is an LineSegment intersecting the ray down
+    if(root->getIthChild(index)!= nullptr && root->getIthChild(index)->getSpannedSlabs() & spanningFlag == 0)
+    {
+        //check the subTree to my right
+        segment = &max(*segment, *pointLocationMiddle(root->getIthChild(index), point, slabIndex), YLeftLessThan());
+        //case nothing intersect within the sub-tree
+        if (segment->getYLeft() == -1  && root->getIthVal(index).getXLeft() <= point.getX() <= root->getIthVal(index).getXRight() )
+        {
+            segment = &root->getIthVal(index);
+        }
+    }
     return segment;
 }
