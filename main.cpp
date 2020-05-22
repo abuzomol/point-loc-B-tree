@@ -26,8 +26,8 @@ int main()
     string fileName = argv[2];
     */
     string fileName = "objects.1K.1583107550.long";
-     //unsigned int linesSegSize = 10000000;
-    unsigned int linesSegSize = 501;
+     unsigned int linesSegSize = 10000000;
+    //unsigned int linesSegSize = 501;
 
     // double xLeft, xRight, yLeft, yRight;
     char* memBlock = new char[sizeof(double) * 3];
