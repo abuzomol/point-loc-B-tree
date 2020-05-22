@@ -13,6 +13,7 @@
 #include "Tree.h"
 
 
+
 using namespace std;
 
 int main()
@@ -26,7 +27,7 @@ int main()
     string fileName = argv[2];
     */
     string fileName = "objects.1K.1583107550.long";
-     unsigned int linesSegSize = 10000000;
+     unsigned int linesSegSize = 1000000;
     //unsigned int linesSegSize = 501;
 
     // double xLeft, xRight, yLeft, yRight;
@@ -102,7 +103,20 @@ int main()
 
     std::cout << "Filling the tree         : " << elapsed.count() / 1000
               << " ms\n";
-    cout << "**************************************" << endl;
+
+    Point point;
+    point.setX(4211);
+    point.setY(90000);
+    start = std::chrono::high_resolution_clock::now();
+    auto ans = pointLocationQuery(superRoot, point);
+    finish = std::chrono::high_resolution_clock::now();
+    elapsed = finish - start;
+
+    std::cout << "Querying the tree        : " << elapsed.count() / 1000
+              << " ms";
+
+
+    cout << "\n**************************************" << endl;
 
     // Print information
     int zero = 0, one = 1, two = 2, three = 3, four = 4;
@@ -111,13 +125,11 @@ int main()
     cout << "\nNumber of super leaves   : " << superNodesTotal;
     cout << "\nHeight of SuperTree      : " << superTree.size();
     cout << "\nRoot values              : " << superRoot;
+    cout << "\npoint                    : " << point;
+    cout << "\nLineSegment              : " << *ans;
     cout << "\n**************************************" << endl;
-    Point point;
-    point.setX(4211);
-    point.setY(90000);
-    cout << "point: " << point;
-    auto ans = pointLocationQuery(superRoot, point);
-    cout << "\nLineSegment: " << *ans;
+
+
     return 0;
 }
 /*

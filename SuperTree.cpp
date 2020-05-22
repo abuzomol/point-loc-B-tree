@@ -292,7 +292,7 @@ const LineSegment* pointLocationQuery(SuperNode& superRoot, Point& point)
     else
         index = superRoot.getValSize();
 
-    cout << "\nlower bound: " << *low << " at position: " << index;
+    //cout << "\nlower bound: " << *low << " at position: " << index;
 
     // get the middleSegment if found
     if (superRoot.getMiddle() != nullptr)
