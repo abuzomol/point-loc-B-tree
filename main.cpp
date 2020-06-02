@@ -26,39 +26,43 @@ int main()
     unsigned int linesSegSize = stoi(argv[1]);
     string fileName = argv[2];
     */
-    string fileName = "objects.1K.1583107550.long";
+    string fileName = "/Users/muzamil/Desktop/pointLocation/objects.100M.1583107550.random";
+
      unsigned int linesSegSize;
-     linesSegSize = 1000000;
+     linesSegSize = 32;
+
+
     //unsigned int linesSegSize = 501;
 
     // double xLeft, xRight, yLeft, yRight;
-    char* memBlock = new char[sizeof(double) * 3];
+    char* lineBlock = new char[sizeof(double) * 3];
 
     vector<LineSegment> lineSegs(linesSegSize);
     // lineSegs.reserve(linesSegSize);
 
     auto start = std::chrono::high_resolution_clock::now();
-    ifstream fin(fileName, ios::binary);
+    ifstream finLines(fileName, ios::binary);
 
     //read lineSegments from file
-    for (unsigned int i = 0; i < linesSegSize; i++)
+    for (unsigned int i = 0; i < lineSegs.size(); i++)
     {
         // fin >> xLeft >>  xRight >> yLeft;
 
-        double* doubleBlock = (double*)memBlock;
+        double* doubleBlock = (double*)lineBlock;
 
-        fin.read(memBlock, sizeof(double) * 3);
+        finLines.read(lineBlock, sizeof(double) * 3);
         lineSegs[i].setXLeft(doubleBlock[0]);
         lineSegs[i].setXRight(doubleBlock[1]);
         lineSegs[i].setYLeft(doubleBlock[2]);
         lineSegs[i].setYRight(doubleBlock[2]);
     }
-    fin.close();
+    finLines.close();
+
     auto finish = std::chrono::high_resolution_clock::now();
 
     std::chrono::duration<double> elapsed = finish - start;
-    std::cout << "Time to read File        : " << elapsed.count() / 1000
-              << " ms\n";
+    std::cout << "Time to read lines       : " << elapsed.count()
+              << " s\n";
 
     // get all x coordinates from lineSegments
     vector<double> xValues;
@@ -85,8 +89,8 @@ int main()
     finish = std::chrono::high_resolution_clock::now();
     elapsed = finish - start;
 
-    std::cout << "Constructing the tree    : " << elapsed.count() / 1000
-              << " ms\n";
+    std::cout << "Constructing the tree    : " << elapsed.count()
+              << " s\n";
 
     // fill in itermediate <lineSeg*>
     vector<LineSegment*> lineSegments;
@@ -102,32 +106,64 @@ int main()
     finish = std::chrono::high_resolution_clock::now();
     elapsed = finish - start;
 
-    std::cout << "Filling the tree         : " << elapsed.count() / 1000
-              << " ms\n";
+    std::cout << "Filling the tree         : " << elapsed.count()
+              << " s\n";
 
-    Point point;
-    point.setX(4211);
-    point.setY(90000);
-    start = std::chrono::high_resolution_clock::now();
-    auto ans = pointLocationQuery(superRoot, point);
-    finish = std::chrono::high_resolution_clock::now();
-    elapsed = finish - start;
+    unsigned int pointsSize ;
+    vector<int> pointsSizes = {500};
+    //vector<int> pointsSizes = {500000,1000000, 2000000,5000000,10000000};
+    fileName = "/Users/muzamil/Desktop/pointLocation/objects.100M.1583107551.random";
 
-    std::cout << "Querying the tree        : " << elapsed.count() / 1000
-              << " ms";
+    for(int t = 0 ; t < pointsSizes.size() ; t++)
+    {
+        // double xLeft, xRight, yLeft, yRight;
+        char* pointBlock = new char[sizeof(double) * 2];
 
+        pointsSize = pointsSizes[t];
+        vector<Point> points(pointsSize);
+        ifstream finPoints(fileName, ios::binary);
 
-    cout << "\n**************************************" << endl;
+        start = std::chrono::high_resolution_clock::now();
 
-    // Print information
-    int zero = 0, one = 1, two = 2, three = 3, four = 4;
-    cout << "Number of lineSegments   : " << lineSegs.size();
-    cout << "\nBlock Size               : " << CHILD_SIZE;
+        //read lineSegments from file
+        for (unsigned int i = 0; i < points.size(); i++)
+        {
+            // fin >> xLeft >>  xRight >> yLeft;
+
+            double* doubleBlock = (double*)pointBlock;
+
+            finPoints.read(pointBlock, sizeof(double) * 2);
+            points[i].setX(doubleBlock[0] * -1);
+            points[i].setY(doubleBlock[1] * -1);
+        }
+        finPoints.close();
+
+        finish = std::chrono::high_resolution_clock::now();
+        elapsed = finish - start;
+        std::cout << "\nTime to read points       : " << elapsed.count()
+                  << " s";
+
+        start = std::chrono::high_resolution_clock::now();
+        for (int i = 0; i < points.size(); i++)
+        {
+            pointLocationQuery(superRoot, points[i]);
+        }
+        finish = std::chrono::high_resolution_clock::now();
+        elapsed = finish - start;
+        std::cout << "\nQuerying the tree        : " << elapsed.count() << " s";
+        cout << "\nNumber of queries        : " << points.size();
+    }
+
+    cout << "\n**************************************" ;
+
+    cout << "\nNumber of lineSegments   : " << lineSegs.size();
+    //cout << "\nNumber of queries        : " << points.size();
+    cout << "\nBranching factor         : " << CHILD_SIZE;
     cout << "\nNumber of super leaves   : " << superNodesTotal;
     cout << "\nHeight of SuperTree      : " << superTree.size();
     cout << "\nRoot values              : " << superRoot;
-    cout << "\npoint                    : " << point;
-    cout << "\nLineSegment              : " << *ans;
+    //cout << "\npoint                    : " << point;
+    //cout << "\nLineSegment              : " << *ans;
     cout << "\n**************************************" << endl;
 
 

@@ -68,4 +68,5 @@ std::ostream &operator<<(std::ostream &os, const Node &node) {
     for (int i = 0; i < node.val.size(); ++i) {
         os << node.val[i] << " ";
     }
+    return os;
 }
