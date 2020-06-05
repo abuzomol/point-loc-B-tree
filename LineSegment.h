@@ -14,7 +14,7 @@ private:
 
 public:
     // assume for now all coordinates are positives
-    LineSegment() : xLeft(-1), xRight(-1), yLeft(-1) {}
+    LineSegment() : xLeft(INFTY), xRight(-1), yLeft(INFTY) {}
 
     LineSegment(double xLeft, double xRight, double yLeft, double yRight)
             : xLeft(xLeft), xRight(xRight), yLeft(yLeft) {

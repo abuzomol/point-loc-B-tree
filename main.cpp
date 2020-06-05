@@ -10,6 +10,7 @@
 #include "Point.h"
 #include "SuperNode.h"
 #include "SuperTree.h"
+
 #include "Tree.h"
 
 
@@ -26,10 +27,10 @@ int main()
     unsigned int linesSegSize = stoi(argv[1]);
     string fileName = argv[2];
     */
-    string fileName = "/Users/muzamil/Desktop/pointLocation/objects.100M.1583107550.random";
+    string fileName = "/Users/muzamil/Desktop/point-location/objects.100M.1583107550.random";
 
      unsigned int linesSegSize;
-     linesSegSize = 32;
+     linesSegSize = 10000000;
 
 
     //unsigned int linesSegSize = 501;
@@ -82,7 +83,7 @@ int main()
 
     unsigned int superNodesTotal = ceil(xValues.size() / VAL_SIZE);
     unsigned int superHeight =
-        ceil(log2(superNodesTotal) / log2(CHILD_SIZE)) + 1;
+        ceil(log(superNodesTotal) / log(CHILD_SIZE)) + 1;
     SuperTree superTree(superHeight, xValues);
     SuperNode superRoot = superTree.getRoot();
 
@@ -110,9 +111,9 @@ int main()
               << " s\n";
 
     unsigned int pointsSize ;
-    vector<int> pointsSizes = {500};
-    //vector<int> pointsSizes = {500000,1000000, 2000000,5000000,10000000};
-    fileName = "/Users/muzamil/Desktop/pointLocation/objects.100M.1583107551.random";
+    //vector<int> pointsSizes ;
+    vector<int> pointsSizes = {500000,1000000, 2000000,5000000,10000000};
+    fileName = "/Users/muzamil/Desktop/point-location/objects.100M.1583107551.random";
 
     for(int t = 0 ; t < pointsSizes.size() ; t++)
     {
@@ -133,8 +134,8 @@ int main()
             double* doubleBlock = (double*)pointBlock;
 
             finPoints.read(pointBlock, sizeof(double) * 2);
-            points[i].setX(doubleBlock[0] * -1);
-            points[i].setY(doubleBlock[1] * -1);
+            points[i].setX(doubleBlock[1] * -1);
+            points[i].setY(doubleBlock[0] * -1);
         }
         finPoints.close();
 
@@ -142,11 +143,12 @@ int main()
         elapsed = finish - start;
         std::cout << "\nTime to read points       : " << elapsed.count()
                   << " s";
+        vector<LineSegment> ans(points.size());
 
         start = std::chrono::high_resolution_clock::now();
         for (int i = 0; i < points.size(); i++)
         {
-            pointLocationQuery(superRoot, points[i]);
+            ans[i] = *pointLocationQuery(superRoot, points[i]);
         }
         finish = std::chrono::high_resolution_clock::now();
         elapsed = finish - start;

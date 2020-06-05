@@ -23,6 +23,7 @@ class Node
 
  public:
   Node();
+
   explicit Node(std::vector<LineSegment>  val);
   Node(std::vector<LineSegment>  val,
        std::vector<Node*>  child,

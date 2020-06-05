@@ -69,7 +69,7 @@ const Node* SuperNode::getIthRightSemiLines(int& i)
 
 void SuperNode::setIthRightSemiLines(Node& root, int& i)
 {
-  SuperNode::leftSemiLines[i] = &root;
+  SuperNode::rightSemiLines[i] = &root;
 }
 
 std::ostream& operator<<(std::ostream& os, const SuperNode& superNode)
