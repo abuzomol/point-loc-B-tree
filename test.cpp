@@ -140,6 +140,8 @@ TEST(IntervalTreeTest, IntervalTreeProperlyBuilt)
         EXPECT_EQ(lineSegments[i].getXLeft(), query.getXLeft());
         EXPECT_EQ(lineSegments[i].getXRight(), query.getXRight());
         EXPECT_EQ(lineSegments[i].getYLeft(), query.getYLeft());
+
+        //EXPECT_EQ(lineSegments[i], query);
     }
 
     auto query = pointLocationQuery(superRoot, points[8]);

@@ -100,10 +100,11 @@ void partitionLineSegments(SuperNode& superRoot,
 {
     // TODO() swap the for loops
     // TODO() remove if statements
-    for (int i = 0; i < superRoot.getValSize(); i++)
+    for (auto& lineSegment : lineSegments)
+
     {
         // for loop that scan every line segment
-        for (auto& lineSegment : lineSegments)
+        for (int i = 0; i < superRoot.getValSize(); i++)
         {
             // if the lineSegment crosses or touches boundary i
             if (lineSegment->getXLeft() <= superRoot.getIthVal(i)
@@ -141,8 +142,8 @@ void partitionLineSegments(SuperNode& superRoot,
                     && lineSegment->getXRight() >= superRoot.getIthVal(i + 1))
                 {
                     // check this for pointers
-                    if (find(middle->begin(), middle->end(), *lineSegment)
-                        == middle->end())
+                    //if (find(middle->begin(), middle->end(), *lineSegment)
+                    //    == middle->end())
                     {
                         middle->push_back(*lineSegment);
                     }
@@ -258,22 +259,25 @@ void fillSuperTree(SuperNode& superRoot, vector<LineSegment*>& lineSegments)
     // remainingLineSegments
     partitionLineSegments(
         superRoot, lineSegments, left, right, middle, remainingLineSegments);
-
+    //cout << "\nPartition of lineSegments into left, right, middle and remaining ----> Done.";
     // construct the left B-trees for each cell of superRoot
     if (!left->empty())
     {
         constructLeftTrees(superRoot, left);
     }
+    //cout << "\nConstructing Left tree ----> Done.";
     // construct the right B-trees for each cell of superRoot
     if (!right->empty())
     {
         constructRightTrees(superRoot, right);
     }
+    //cout << "\nConstrcuting right tree ----> Done.";
     // construct the middle B-trees
     if (!middle->empty())
     {
         constructMiddleTree(superRoot, middle);  // ERROR HERE
     }
+    //cout << "\nConstrcuting Middle tree ----> Done.";
     // recursive call for fill in the tree with remaining lineSegments
     for (int i = 0; i < remainingLineSegments->size(); i++)
     {
@@ -507,14 +511,14 @@ const LineSegment& pointLocationMiddle(const MiddleNode* root,
      */
     while (index > -1 && segment->getYLeft() == INFTY)
     {
-        while (
+        while ( index > -1 &&
             root->getIthChild(index) != nullptr
             && ((root->getIthChild(index)->getSpannedSlabs() >> slabIndex) & 1)
-                   == 0)
+                   == 0  )
             index--;
 
         // case there is a LineSegment intersecting the ray down
-        if (root->getIthChild(index) != nullptr
+        if ( index > -1 && root->getIthChild(index) != nullptr
             && ((root->getIthChild(index)->getSpannedSlabs() >> slabIndex) & 1)
                    == 1)
         {

@@ -90,7 +90,7 @@ int main()
     finish = std::chrono::high_resolution_clock::now();
     elapsed = finish - start;
 
-    std::cout << "Constructing the tree    : " << elapsed.count()
+    std::cout << "Constructing the super tree    : " << elapsed.count()
               << " s\n";
 
     // fill in itermediate <lineSeg*>
@@ -107,7 +107,7 @@ int main()
     finish = std::chrono::high_resolution_clock::now();
     elapsed = finish - start;
 
-    std::cout << "Filling the tree         : " << elapsed.count()
+    std::cout << "Filling the super tree         : " << elapsed.count()
               << " s\n";
 
     unsigned int pointsSize ;
@@ -148,7 +148,7 @@ int main()
         start = std::chrono::high_resolution_clock::now();
         for (int i = 0; i < points.size(); i++)
         {
-            ans[i] = *pointLocationQuery(superRoot, points[i]);
+            ans[i] = pointLocationQuery(superRoot, points[i]);
         }
         finish = std::chrono::high_resolution_clock::now();
         elapsed = finish - start;

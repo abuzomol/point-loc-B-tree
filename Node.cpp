@@ -8,15 +8,17 @@
 
 Node::Node() {
     Node::val.resize(VAL_SIZE);
-    for(int i = 0; i < VAL_SIZE ; i++)
+    /*for(int i = 0; i < VAL_SIZE ; i++)
     {
         Node::val[i] = *new LineSegment();
-    }
+    }*/
+    //TODO() change resize into reserve, and use emplace_back instead!
     Node::child.resize(CHILD_SIZE);
     Node::minMaxX.resize(CHILD_SIZE);
 }
 
 Node::Node(std::vector<LineSegment> val) : val(std::move(val)) {
+    //TODO() change resize into reserve, and use emplace_back instead!
     Node::child.resize(CHILD_SIZE);
     Node::minMaxX.resize(CHILD_SIZE);
 }
