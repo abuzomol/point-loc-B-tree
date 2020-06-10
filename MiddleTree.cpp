@@ -47,6 +47,7 @@ MiddleTree::MiddleTree(const unsigned int& height,
             }
         }
         MiddleTree::tree.back().push_back(*node);
+        delete node;
     }
     //TODO() change height of tree
     if (MiddleTree::tree.size() > 1)

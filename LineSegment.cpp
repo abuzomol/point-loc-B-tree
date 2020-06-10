@@ -24,6 +24,13 @@ double LineSegment::getYRight() const { return yLeft; }
 
 void LineSegment::setYRight(double yRight) { LineSegment::yLeft = yRight; }
 
+void LineSegment::setAll(double xLeft, double xRight, double yLeft){
+    LineSegment::setXLeft(xLeft);
+    LineSegment::setXRight(xRight);
+    LineSegment::setYLeft(yLeft);
+}
+
+
 bool LineSegment::isHorizontal() {
     return std::fabs(getYLeft() - getYRight()) < EPS;
 }

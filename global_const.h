@@ -39,7 +39,7 @@
 #define QUERY 2
 */
 
-#define B_SIZE 4
+#define B_SIZE 2
 #define CHILD_SIZE (B_SIZE + 1)
 #define VAL_SIZE B_SIZE
 #define MIN_VAL 2

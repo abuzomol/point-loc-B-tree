@@ -154,6 +154,7 @@ int main()
         elapsed = finish - start;
         std::cout << "\nQuerying the tree        : " << elapsed.count() << " s";
         cout << "\nNumber of queries        : " << points.size();
+        //free(&points);
     }
 
     cout << "\n**************************************" ;

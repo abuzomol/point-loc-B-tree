@@ -9,6 +9,8 @@
 #include "MiddleTree.h"
 #include "Tree.h"
 
+#include <chrono>
+
 using namespace std;
 
 SuperTree::SuperTree(const int& height) { superTree.resize(height); }
@@ -18,6 +20,8 @@ SuperTree::SuperTree(const int& height, const std::vector<double>& xValues)
     superTree.resize(height);
 
     // construct the leaves of the superTree
+    auto start = std::chrono::high_resolution_clock::now();
+
     unsigned int numOfLeaves = xValues.size() % VAL_SIZE == 0
                                    ? xValues.size() / VAL_SIZE
                                    : xValues.size() / VAL_SIZE + 1;
@@ -43,8 +47,11 @@ SuperTree::SuperTree(const int& height, const std::vector<double>& xValues)
                 INFTY, VAL_SIZE - i - 1);
         }
     }
-
+    auto finish = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed = finish - start;
+    cout <<"constructing leaves nodes: " <<  elapsed.count() <<endl;
     // go over every level in the tree, fill values, and children bottom up
+    start = std::chrono::high_resolution_clock::now();
     for (int i = height - 2; i > -1; --i)
     {
         // size = ceil(level below/branching factor)
@@ -87,6 +94,9 @@ SuperTree::SuperTree(const int& height, const std::vector<double>& xValues)
             }
         }
     }
+    finish = std::chrono::high_resolution_clock::now();
+    elapsed = finish-start;
+    cout << "Building internal nodes: " << elapsed.count() <<endl;
 }
 
 // check superRoot is not null
@@ -98,7 +108,6 @@ void partitionLineSegments(SuperNode& superRoot,
                            vector<LineSegment>* middle,
                            vector<vector<LineSegment*>*>* remainingLineSegments)
 {
-    // TODO() swap the for loops
     // TODO() remove if statements
     for (auto& lineSegment : lineSegments)
 
@@ -142,7 +151,7 @@ void partitionLineSegments(SuperNode& superRoot,
                     && lineSegment->getXRight() >= superRoot.getIthVal(i + 1))
                 {
                     // check this for pointers
-                    //if (find(middle->begin(), middle->end(), *lineSegment)
+                    // if (find(middle->begin(), middle->end(), *lineSegment)
                     //    == middle->end())
                     {
                         middle->push_back(*lineSegment);
@@ -257,27 +266,35 @@ void fillSuperTree(SuperNode& superRoot, vector<LineSegment*>& lineSegments)
 
     // partition lineSegments into left, middle and right and
     // remainingLineSegments
+
+    //cout <<"partitioning the data" <<endl;
     partitionLineSegments(
         superRoot, lineSegments, left, right, middle, remainingLineSegments);
-    //cout << "\nPartition of lineSegments into left, right, middle and remaining ----> Done.";
+    // cout << "\nPartition of lineSegments into left, right, middle and
+    // remaining ----> Done.";
     // construct the left B-trees for each cell of superRoot
     if (!left->empty())
     {
         constructLeftTrees(superRoot, left);
     }
-    //cout << "\nConstructing Left tree ----> Done.";
+
+    //cout <<"consrcuted left trees" <<endl;
+
+    // cout << "\nConstructing Left tree ----> Done.";
     // construct the right B-trees for each cell of superRoot
     if (!right->empty())
     {
         constructRightTrees(superRoot, right);
     }
-    //cout << "\nConstrcuting right tree ----> Done.";
+    //cout <<"consrcuted right trees" <<endl;
+    // cout << "\nConstrcuting right tree ----> Done.";
     // construct the middle B-trees
     if (!middle->empty())
     {
         constructMiddleTree(superRoot, middle);  // ERROR HERE
     }
-    //cout << "\nConstrcuting Middle tree ----> Done.";
+
+    // cout << "\nConstrcuting Middle tree ----> Done.";
     // recursive call for fill in the tree with remaining lineSegments
     for (int i = 0; i < remainingLineSegments->size(); i++)
     {
@@ -288,6 +305,12 @@ void fillSuperTree(SuperNode& superRoot, vector<LineSegment*>& lineSegments)
                           *((*remainingLineSegments)[i]));
         }
     }
+
+    //cout <<"consrcuted middle trees" <<endl;
+    delete left;
+    delete right;
+    delete middle;
+    delete remainingLineSegments;
 }
 
 const int SuperTree::size() const { return SuperTree::superTree.size(); }
@@ -300,10 +323,10 @@ const vector<std::vector<SuperNode>>& SuperTree::getSuperTree() const
 
 const LineSegment& pointLocationQuery(SuperNode& superRoot, Point& point)
 {
-    const LineSegment* middleSegment = new LineSegment();
-    const LineSegment* leftSegment = new LineSegment();
-    const LineSegment* rightSegment = new LineSegment();
-    const LineSegment* recursiveSegment = new LineSegment();
+    LineSegment middleSegment;
+    LineSegment leftSegment;
+    LineSegment rightSegment;
+    LineSegment recursiveSegment;
 
     // get the lower bound of x-values
     auto low = lower_bound(
@@ -315,65 +338,54 @@ const LineSegment& pointLocationQuery(SuperNode& superRoot, Point& point)
     else
         index = superRoot.getValSize();
 
-    // cout << "\nlower bound: " << *low << " at position: " << index;
-
     // get the middleSegment if found
     if (superRoot.getMiddle() != nullptr)
     {
         middleSegment =
-            &pointLocationMiddle(superRoot.getMiddle(), point, index);
+            pointLocationMiddle(superRoot.getMiddle(), point, index);
     }
 
-    // case the x value equals a boundary
-    // if (superRoot.getIthVal(index) == point.getX())
-    //{
-    //    return middleSegment;
-    // }
-    // else
+    // get the leftSegment
+    if (index < superRoot.getValSize()
+        && superRoot.getIthLeftSemiLines(index) != nullptr)
     {
-        // get the leftSegment
-        if (index < superRoot.getValSize()
-            && superRoot.getIthLeftSemiLines(index) != nullptr)
-        {
-            leftSegment =
-                &pointLocationLeft(superRoot.getIthLeftSemiLines(index), point);
-        }
-        // get the rightSegment from previous index if not right border
-        if (0 < index < superRoot.getValSize()
-            && superRoot.getIthRightSemiLines(index) != nullptr)
-        {
-            index--;
-            rightSegment = &pointLocationRight(
-                superRoot.getIthRightSemiLines(index), point);
-            index++;
-        }
-        else  // if right border
-        {
-            rightSegment = &pointLocationRight(
-                superRoot.getIthRightSemiLines(index), point);
-        }
-        // get the recursive segment
-        if (superRoot.getIthChild(index) != nullptr)
-        {
-            recursiveSegment =
-                &pointLocationQuery(*superRoot.getIthChild(index), point);
-        }
+        leftSegment =
+            pointLocationLeft(superRoot.getIthLeftSemiLines(index), point);
+    }
+    // get the rightSegment from previous index if not right border
+    if (0 < index < superRoot.getValSize()
+        && superRoot.getIthRightSemiLines(index) != nullptr)
+    {
+        index--;
+        rightSegment =
+            pointLocationRight(superRoot.getIthRightSemiLines(index), point);
+        index++;
+    }
+    else  // if right border
+    {
+        rightSegment =
+            pointLocationRight(superRoot.getIthRightSemiLines(index), point);
+    }
+    // get the recursive segment
+    if (superRoot.getIthChild(index) != nullptr)
+    {
+        recursiveSegment =
+            pointLocationQuery(*superRoot.getIthChild(index), point);
     }
 
-    if (middleSegment->getYLeft() == INFTY)
-        middleSegment = new LineSegment(-1, -1, -1, -1);
-    if (leftSegment->getYLeft() == INFTY)
-        leftSegment = new LineSegment(-1, -1, -1, -1);
-    if (rightSegment->getYLeft() == INFTY)
-        rightSegment = new LineSegment(-1, -1, -1, -1);
-    if (recursiveSegment->getYLeft() == INFTY)
-        recursiveSegment = new LineSegment(-1, -1, -1, -1);
-    const LineSegment* ans = &max(*leftSegment,
-                                     max(*middleSegment,
-                                         max(*rightSegment, *recursiveSegment, YLeftLessThan()),
-                                         YLeftLessThan()),
-                                     YLeftLessThan());
-    return *ans;
+    if (middleSegment.getYLeft() == INFTY) middleSegment.setAll(-1, -1, -1);
+    if (leftSegment.getYLeft() == INFTY) leftSegment.setAll(-1, -1, -1);
+    if (rightSegment.getYLeft() == INFTY) rightSegment.setAll(-1, -1, -1);
+    if (recursiveSegment.getYLeft() == INFTY)
+        recursiveSegment.setAll(-1, -1, -1);
+
+    const LineSegment ans =
+        max(leftSegment,
+            max(middleSegment,
+                max(rightSegment, recursiveSegment, YLeftLessThan()),
+                YLeftLessThan()),
+            YLeftLessThan());
+    return ans;
 }
 
 /* This function queries the tree of line segments to the right of one of the
@@ -383,8 +395,8 @@ const LineSegment& pointLocationQuery(SuperNode& superRoot, Point& point)
  */
 const LineSegment& pointLocationLeft(const Node* root, Point& point)
 {
-    const LineSegment* segment = new LineSegment();
-    if (root == nullptr) return *segment;
+    LineSegment segment;
+    if (root == nullptr) return segment;
     // Dummy lineSegment to facilitate checking. Can be improved by a function
     // call
     LineSegment pointLineSegment(
@@ -399,7 +411,7 @@ const LineSegment& pointLocationLeft(const Node* root, Point& point)
         index = up - root->getVal().begin();
     else
         index = root->getValSize();
-    while (index > -1 && segment->getYLeft() == INFTY)
+    while (index > -1 && segment.getYLeft() == INFTY)
     {
         /* ignores the subtrees with no line segment stabbed by point.
          TODO(): can we speed up this further to get  log B instead of B?
@@ -409,20 +421,20 @@ const LineSegment& pointLocationLeft(const Node* root, Point& point)
         if (root->getMinMaxX()[index] >= point.getX())
         {
             // check the subTree to my right
-            segment = &max(*segment,
+            segment = max(segment,
                            pointLocationLeft(root->getIthChild(index), point),
                            YLeftLessThan());
         }
         // case nothing intersect within the sub-tree i.e. root is a leaf
-        if (segment->getYLeft() == INFTY
+        if (segment.getYLeft() == INFTY
             && root->getIthVal(index).getXLeft() <= point.getX()
             && root->getIthVal(index).getYLeft() <= point.getY())
         {
-            segment = &root->getIthVal(index);
+            segment = root->getIthVal(index);
         }
         index--;
     }
-    return *segment;
+    return segment;
 }
 
 /* This function queries the tree of line segments to the right of one of the
@@ -433,8 +445,8 @@ const LineSegment& pointLocationLeft(const Node* root, Point& point)
 
 const LineSegment& pointLocationRight(const Node* root, Point& point)
 {
-    const LineSegment* segment = new LineSegment();
-    if (root == nullptr) return *segment;
+    LineSegment segment;
+    if (root == nullptr) return segment;
     LineSegment pointLineSegment(
         point.getX(), point.getX(), point.getY(), point.getY());
     auto up = upper_bound(root->getVal().begin(),
@@ -449,27 +461,27 @@ const LineSegment& pointLocationRight(const Node* root, Point& point)
     /* ignores the subtrees with no line segment stabbed by point.
      TO DO: can we speed up this further to get  log B instead of B
      */
-    while (index > -1 && segment->getYLeft() == INFTY)
+    while (index > -1 && segment.getYLeft() == INFTY)
     {
         while (root->getMinMaxX()[index] < point.getX() && index > 0) index--;
         // case there is an LineSegment stabbed by the ray down
         if (root->getMinMaxX()[index] <= point.getX())
         {
             // check the subTree to my right
-            segment = &max(*segment,
+            segment = max(segment,
                            pointLocationRight(root->getIthChild(index), point),
                            YLeftLessThan());
         }
         // case nothing intersect within the sub-tree i.e root is a leaf node
-        if (segment->getYLeft() == INFTY
+        if (segment.getYLeft() == INFTY
             && root->getIthVal(index).getXRight() >= point.getX()
             && root->getIthVal(index).getYLeft() <= point.getY())
         {
-            segment = &root->getIthVal(index);
+            segment = root->getIthVal(index);
         }
         index--;
     }
-    return *segment;
+    return segment;
 }
 
 /* This function queries the middleTree associated with a superNode. Recall
@@ -483,10 +495,10 @@ const LineSegment& pointLocationMiddle(const MiddleNode* root,
                                        Point& point,
                                        int& slabIndex)
 {
-    const LineSegment* segment = new LineSegment();
+    LineSegment segment;
     // lower bound will return the val.size() if no element in the vector is
     // less than point.x
-    if (root == nullptr || slabIndex == root->getValSize()) return *segment;
+    if (root == nullptr || slabIndex == root->getValSize()) return segment;
 
     // get the upper bound for y
     LineSegment pointLineSegment(
@@ -509,35 +521,35 @@ const LineSegment& pointLocationMiddle(const MiddleNode* root,
      slabIndex
      TODO(): can we speed up this further to get  log B instead of B
      */
-    while (index > -1 && segment->getYLeft() == INFTY)
+    while (index > -1 && segment.getYLeft() == INFTY)
     {
-        while ( index > -1 &&
-            root->getIthChild(index) != nullptr
+        while (
+            index > -1 && root->getIthChild(index) != nullptr
             && ((root->getIthChild(index)->getSpannedSlabs() >> slabIndex) & 1)
-                   == 0  )
+                   == 0)
             index--;
 
         // case there is a LineSegment intersecting the ray down
-        if ( index > -1 && root->getIthChild(index) != nullptr
+        if (index > -1 && root->getIthChild(index) != nullptr
             && ((root->getIthChild(index)->getSpannedSlabs() >> slabIndex) & 1)
                    == 1)
         {
             // check the subTree to my right
-            segment = &max(
-                *segment,
+            segment = max(
+                segment,
                 pointLocationMiddle(root->getIthChild(index), point, slabIndex),
                 YLeftLessThan());
         }
         // case nothing intersects within the sub-tree i.e. child[index] returns
         // empty lineSegment
-        if (segment->getYLeft() == INFTY
-            && root->getIthVal(index).getXLeft() <= point.getX()
+        if (segment.getYLeft() == INFTY
+            && root->getIthVal(index).getXLeft() <= point.getX() && point.getX()
                    <= root->getIthVal(index).getXRight()
             && root->getIthVal(index).getYLeft() <= point.getY())
         {
-            segment = &root->getIthVal(index);
+            segment = root->getIthVal(index);
         }
         index--;
     }
-    return *segment;
+    return segment;
 }

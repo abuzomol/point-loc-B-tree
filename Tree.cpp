@@ -51,6 +51,7 @@ Tree::Tree(const int& height,
         else
             node->setIthMinMaxX(-1, CHILD_SIZE-1);
         Tree::tree.back().push_back(*node);
+        delete node;
     }
 
     if (Tree::tree.size() > 1)
