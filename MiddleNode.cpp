@@ -13,10 +13,15 @@ MiddleNode::MiddleNode(const std::vector<LineSegment>& val) : val(val)
 {
   MiddleNode::child.resize(CHILD_SIZE);
 }
+
+MiddleNode::MiddleNode(const std::vector<LineSegment>& val,const unsigned int& spannedSlabs):val(std::move(val)) , spannedSlabs(spannedSlabs)
+{
+    MiddleNode::child.resize(CHILD_SIZE);
+}
 MiddleNode::MiddleNode(const std::vector<LineSegment>& val,
                        const std::vector<MiddleNode*>& child,
                        const unsigned int& spannedSlabs)
-    : val(val), child(child), spannedSlabs(spannedSlabs)
+    : val(std::move(val) ), child( std::move(child)), spannedSlabs(spannedSlabs)
 {
 }
 const std::vector<LineSegment>& MiddleNode::getVal() const { return val; }

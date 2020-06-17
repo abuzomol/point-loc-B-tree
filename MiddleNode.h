@@ -33,6 +33,7 @@ class MiddleNode
   void setSpannedSlabs(unsigned int spannedSlabs);
   MiddleNode();
   MiddleNode(const std::vector<LineSegment>& val);
+  MiddleNode(const std::vector<LineSegment>& val,const unsigned int& spannedSlabs);
   MiddleNode(const std::vector<LineSegment>& val,
              const std::vector<MiddleNode*>& child,
              const unsigned int& spannedSlabs);

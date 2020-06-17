@@ -13,38 +13,39 @@
 
 class Node
 {
- private:
-  // Val can store a double for y-value, but the total ordering of lineSegments
-  // make it easier to use the lineSegment itself.
-  // Hence, we can save the size of double for each node.
-  std::vector<LineSegment> val;
-  std::vector<Node*> child;
-  std::vector<double> minMaxX;
+   private:
+    // Val can store a double for y-value, but the total ordering of
+    // lineSegments make it easier to use the lineSegment itself. Hence, we can
+    // save the size of double for each node.
+    std::vector<LineSegment> val;
+    std::vector<Node*> child;
+    std::vector<double> minMaxX;
 
- public:
-  Node();
+   public:
+    Node();
 
-  explicit Node(std::vector<LineSegment>  val);
-  Node(std::vector<LineSegment>  val,
-       std::vector<Node*>  child,
-       std::vector<double>& minMaxX);
-  const std::vector<LineSegment>& getVal() const;
-  void setVal(const std::vector<LineSegment>& val);
-  void setIthVal(const LineSegment& lineSegment,const int& i);
-  const LineSegment& getIthVal(const int& i) const;
-  void setValSize(const unsigned int& valSize) ;
-  const std::vector<Node*>& getChild() const;
-  void setChild(const std::vector<Node*>& child);
-  const std::vector<double>& getMinMaxX() const;
-  void setMinMaxX(const std::vector<double>& minMaxX);
-  void setIthMinMaxX(const double& minMax, const int& i);
-  const Node* getIthChild(int& i) const;
-  void setIthChild(Node& node, const int& i);
-  const unsigned int getValSize() const;
+    explicit Node(std::vector<LineSegment>& val);
+    Node(std::vector<LineSegment>& val, std::vector<double>& minMaxX);
+    Node(std::vector<LineSegment>& val,
+         std::vector<Node*>& child,
+         std::vector<double>& minMaxX);
+    const std::vector<LineSegment>& getVal() const;
+    void setVal(const std::vector<LineSegment>& val);
+    void setIthVal(const LineSegment& lineSegment, const int& i);
+    const LineSegment& getIthVal(const int& i) const;
+    void setValSize(const unsigned int& valSize);
+    const std::vector<Node*>& getChild() const;
+    void setChild(const std::vector<Node*>& child);
+    const std::vector<double>& getMinMaxX() const;
+    void setMinMaxX(const std::vector<double>& minMaxX);
+    void setIthMinMaxX(const double& minMax, const int& i);
+    const Node* getIthChild(int& i) const;
+    void setIthChild(Node& node, const int& i);
+    const unsigned int getValSize() const;
 
-  const bool underflow() const;
+    const bool underflow() const;
 
-  friend std::ostream &operator<<(std::ostream& os, const Node& node);
+    friend std::ostream& operator<<(std::ostream& os, const Node& node);
 };
 
 std::ostream& operator<<(std::ostream& os, const Node& node);

@@ -73,25 +73,36 @@ int main()
         xValues[i << 1] = lineSegs[i].getXLeft();
         xValues[(i << 1) + 1] = lineSegs[i].getXRight();
     }
+
+    start = std::chrono::high_resolution_clock::now();
     // sort xValues.
     sort(xValues.begin(), xValues.end());
 
+    finish = std::chrono::high_resolution_clock::now();
+    elapsed = finish - start ;
+    std::cout << "Time to sort xValues       : " << elapsed.count()
+              << " s\n";
     // sort lineSegments ordered by y
-    sort(lineSegs.begin(), lineSegs.end(), YLeftLessThan());
 
     start = std::chrono::high_resolution_clock::now();
+    sort(lineSegs.begin(), lineSegs.end(), YLeftLessThan());
+    finish  = std::chrono::high_resolution_clock::now();
+    elapsed = finish - start ;
+    std::cout << "Time to sort lineSegments       : " << elapsed.count()
+              << " s\n";
 
     unsigned int superNodesTotal = ceil(xValues.size() / VAL_SIZE);
     unsigned int superHeight =
         ceil(log(superNodesTotal) / log(CHILD_SIZE)) + 1;
-    SuperTree superTree(superHeight, xValues);
-    SuperNode superRoot = superTree.getRoot();
 
+    start = std::chrono::high_resolution_clock::now();
+    SuperTree superTree(superHeight, xValues);
     finish = std::chrono::high_resolution_clock::now();
     elapsed = finish - start;
-
     std::cout << "Constructing the super tree    : " << elapsed.count()
               << " s\n";
+
+    SuperNode superRoot = superTree.getRoot();
 
     // fill in itermediate <lineSeg*>
     vector<LineSegment*> lineSegments;
@@ -102,7 +113,7 @@ int main()
 
     start = std::chrono::high_resolution_clock::now();
 
-    fillSuperTree(superRoot, lineSegments);
+    fillSuperTree(superRoot, lineSegs);
 
     finish = std::chrono::high_resolution_clock::now();
     elapsed = finish - start;

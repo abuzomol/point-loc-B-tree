@@ -22,7 +22,7 @@ class SuperTree
 };
 
 void fillSuperTree(SuperNode& superRoot,
-                   std::vector<LineSegment*>& lineSegments);
+                   std::vector<LineSegment>& lineSegments);
 
 const LineSegment& pointLocationQuery(SuperNode& superRoot, Point& point);
 const LineSegment& pointLocationMiddle(const MiddleNode* middleRoot, Point& point, int& index);

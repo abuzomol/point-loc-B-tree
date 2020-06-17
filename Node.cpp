@@ -8,23 +8,24 @@
 
 Node::Node() {
     Node::val.resize(VAL_SIZE);
-    /*for(int i = 0; i < VAL_SIZE ; i++)
-    {
-        Node::val[i] = *new LineSegment();
-    }*/
     //TODO() change resize into reserve, and use emplace_back instead!
     Node::child.resize(CHILD_SIZE);
     Node::minMaxX.resize(CHILD_SIZE);
 }
 
-Node::Node(std::vector<LineSegment> val) : val(std::move(val)) {
+Node::Node(std::vector<LineSegment>& val) : val(std::move(val)) {
     //TODO() change resize into reserve, and use emplace_back instead!
     Node::child.resize(CHILD_SIZE);
     Node::minMaxX.resize(CHILD_SIZE);
 }
+Node::Node(std::vector<LineSegment>& val, std::vector<double>& minMaxX)
+    : val(std::move(val)),minMaxX(minMaxX)
+{
+    child.resize(CHILD_SIZE);
+}
 
-Node::Node(std::vector<LineSegment> val,
-           std::vector<Node *> child,
+Node::Node(std::vector<LineSegment>& val,
+           std::vector<Node *>& child,
            std::vector<double>& minMaxX)
         : val(std::move(val)), child(std::move(child)), minMaxX(minMaxX) {
 }

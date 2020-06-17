@@ -1,7 +1,3 @@
-//
-// Created by muzamil on 1/21/20.
-//
-
 #include "Tree.h"
 
 #include <algorithm>
@@ -19,8 +15,8 @@ Tree::Tree(const int& height,
 
     // construct leaves first
     int noOfLeaves = lineSegments.size() % VAL_SIZE == 0
-                         ? lineSegments.size() / VAL_SIZE
-                         : (lineSegments.size() / VAL_SIZE) + 1;
+                     ? lineSegments.size() / VAL_SIZE
+                     : (lineSegments.size() / VAL_SIZE) + 1;
 
     for (int i = 0; i < noOfLeaves; i++)
     {
@@ -32,7 +28,7 @@ Tree::Tree(const int& height,
                 node->setIthVal(lineSegments[i * VAL_SIZE + j], j);
                 if (isLeftTree)
                     node->setIthMinMaxX(lineSegments[i * VAL_SIZE + j].getXLeft(),
-                                    j);
+                                        j);
                 else
                     node->setIthMinMaxX(lineSegments[i * VAL_SIZE + j].getXRight(),
                                         j);
@@ -82,8 +78,8 @@ Tree::Tree(const int& height,
         for (int i = height - 2; i > -1; --i)
         {
             int size = Tree::tree[i + 1].size() % CHILD_SIZE == 0
-                           ? Tree::tree[i + 1].size() / CHILD_SIZE
-                           : (Tree::tree[i + 1].size() / CHILD_SIZE) + 1;
+                       ? Tree::tree[i + 1].size() / CHILD_SIZE
+                       : (Tree::tree[i + 1].size() / CHILD_SIZE) + 1;
 
             Tree::tree[i].resize(size);
             // go over every node in each level

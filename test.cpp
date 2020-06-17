@@ -84,7 +84,7 @@ TEST(IntervalTreeTest, IntervalTreeProperlyBuilt)
     {
         lineSegmentss.push_back(&lineSeg);
     }
-    fillSuperTree(superRoot, lineSegmentss);
+    fillSuperTree(superRoot, lineSegments);
 
 
     //test left and right and middle trees

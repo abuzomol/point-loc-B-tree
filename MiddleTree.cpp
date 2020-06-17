@@ -22,66 +22,57 @@ MiddleTree::MiddleTree(const unsigned int& height,
     MiddleTree::tree.resize(height);
     // construct leaves first
     int noOfLeaves = lineSegments.size() % VAL_SIZE == 0
-                     ? lineSegments.size() / VAL_SIZE
-                     : (lineSegments.size() / VAL_SIZE) + 1;
-    for (int i = 0; i < noOfLeaves; i++)
+                         ? lineSegments.size() / VAL_SIZE
+                         : (lineSegments.size() / VAL_SIZE) + 1;
+
+    MiddleTree::tree.back().reserve(noOfLeaves);
+    for (int i = 0; i < MiddleTree::tree.capacity() - 1; i++)
     {
-        MiddleNode* node = new MiddleNode();
+        vector<LineSegment> values;
+        values.reserve(VAL_SIZE);
         unsigned int spannedSlabs = 0;
 
         for (int j = 0; j < VAL_SIZE; j++)
         {
-            if (i * VAL_SIZE + j < lineSegments.size())
+            values.emplace_back(lineSegments[i * VAL_SIZE + j]);
+            // set up the slab flag x_start <= b_i <= b_{i+1} <= x_end
+            // TODO() make this more efficient based on indices.
+            if (lineSegments[i * VAL_SIZE + j].getXLeft()
+                    <= superRoot.getIthVal(j)
+                && superRoot.getIthVal(j + 1)
+                       <= lineSegments[i * VAL_SIZE + j].getXRight())
             {
-                node->setIthVal(lineSegments[i * VAL_SIZE + j], j);
-                //set up the slab flag x_start <= b_i <= b_{i+1} <= x_end
-                if (j < VAL_SIZE - 1
-                    && lineSegments[i * VAL_SIZE + j].getXLeft()
-                           <= superRoot.getIthVal(j)
-                    && superRoot.getIthVal(j + 1)
-                           <= lineSegments[i * VAL_SIZE + j].getXRight())
-                {
-                    spannedSlabs |= (1 << j);
-                }
-                node->setSpannedSlabs(spannedSlabs);
+                spannedSlabs |= (1 << j);
             }
         }
-        MiddleTree::tree.back().push_back(*node);
-        delete node;
+        MiddleTree::tree.back().emplace_back(values, spannedSlabs);
     }
-    //TODO() change height of tree
+
+    // fill the last node
+    vector<LineSegment> lastValues;
+    unsigned int lastLeafSpannedSlabs;
+    lastValues.reserve(VAL_SIZE);
+    int t;
+    for (t = 0; (noOfLeaves - 1) * VAL_SIZE + t < lineSegments.size(); t++)
+    {
+        lastValues.emplace_back(lineSegments[(noOfLeaves - 1) * VAL_SIZE + t]);
+        if (lineSegments[(noOfLeaves - 1) * VAL_SIZE + t].getXLeft()
+                <= superRoot.getIthVal(t)
+            && superRoot.getIthVal(t + 1)
+                   <= lineSegments[(noOfLeaves - 1) * VAL_SIZE + t].getXRight())
+        {
+            lastLeafSpannedSlabs |= (1 << t);
+        }
+    }
+    // pad last node with infinities if not full
+    for (t; t < VAL_SIZE; t++)
+    {
+        lastValues.emplace_back();
+    }
+    MiddleTree::tree.back().emplace_back(lastValues, lastLeafSpannedSlabs);
+
     if (MiddleTree::tree.size() > 1)
     {
-        // check if last element is underflow. If so then merge it with its
-        // neighbour
-        /*int last = MiddleTree::tree[height - 1].size() - 1;
-        if ((last >= 1) && MiddleTree::tree[height - 1][last].underflow())
-        {
-            int mid =
-                ceil(MiddleTree::tree[height - 1][last - 1].getValSize() / 2.0);
-            auto* temp = new vector<LineSegment>();
-            temp->resize(MiddleTree::tree[height - 1][last - 1].getValSize()
-                         - mid
-                         + MiddleTree::tree[height - 1][last].getValSize());
-            // copy the elements from previous node to last node
-            for (int i = mid;
-                 i < MiddleTree::tree[height - 1][last - 1].getValSize();
-                 i++)
-            {
-                (*temp)[i - mid] =
-                    MiddleTree::tree[height - 1][last - 1].getIthVal(i);
-            }
-            // copy all elements from last node
-            for (int i = 0; i < MiddleTree::tree[height - 1][last].getValSize();
-                 i++)
-            {
-                (*temp)[i + MiddleTree::tree[height - 1][last - 1].getValSize()
-                        - mid] =
-                    MiddleTree::tree[height - 1][last].getIthVal(i);
-            }
-            MiddleTree::tree[height - 1][last - 1].setValSize(mid);
-            MiddleTree::tree[height - 1][last].setVal(*temp);
-        }*/
         // go over every level in the tree, and elevate the maximum val to the
         // next level
         for (int i = height - 2; i > -1; --i)
@@ -90,37 +81,101 @@ MiddleTree::MiddleTree(const unsigned int& height,
                            ? MiddleTree::tree[i + 1].size() / CHILD_SIZE
                            : (MiddleTree::tree[i + 1].size() / CHILD_SIZE) + 1;
 
-            MiddleTree::tree[i].resize(size);
-            // go over every node in each level
-            for (int j = 0; j < MiddleTree::tree[i].size(); j++)
+            MiddleTree::tree[i].reserve(size);
+            // go over every node in each level except the last one
+            for (int j = 0; j < MiddleTree::tree[i].capacity() - 1; j++)
             {
                 // set up the children
-                unsigned int spannedslabs = 0;
+                unsigned int spannedSlabs = 0;
+                vector<LineSegment> parent;
+                vector<MiddleNode*> child;
+                parent.reserve(VAL_SIZE);
+                child.reserve(CHILD_SIZE);
 
-                for (int k = 0; k < CHILD_SIZE; k++)
+                for (int k = 0; k < VAL_SIZE; k++)
                 {
-                    if (j * CHILD_SIZE + k < MiddleTree::tree[i + 1].size())
-                    {
-                        MiddleTree::tree[i][j].setIthChild(
-                            MiddleTree::tree[i + 1][j * CHILD_SIZE + k], k);
-                        // Do the OR here
-                        spannedslabs |=
-                            MiddleTree::tree[i + 1][j * CHILD_SIZE + k]
-                                .getSpannedSlabs();
-                    }
-                    // set up the values (skip every node with index multiple of
-                    // CHILD_SIZE)
-                    if (k < VAL_SIZE
-                        && j * CHILD_SIZE + k < MiddleTree::tree[i + 1].size())
-                    {
-                        MiddleTree::tree[i][j].setIthVal(
-                            MiddleTree::tree[i + 1][j * CHILD_SIZE + k]
-                                .getVal().back(),
-                            k);
-                    }
+                    parent.emplace_back(
+                        MiddleTree::tree[i + 1][j * CHILD_SIZE + k]
+                            .getVal()
+                            .back());
+                    child.emplace_back(
+                        &MiddleTree::tree[i + 1][j * CHILD_SIZE + k]);
+                    // Do the OR here
+                    spannedSlabs |= MiddleTree::tree[i + 1][j * CHILD_SIZE + k]
+                                        .getSpannedSlabs();
                 }
-                MiddleTree::tree[i][j].setSpannedSlabs(spannedslabs);
+                // add last child
+                child.emplace_back(
+                    &MiddleTree::tree[i + 1][j * CHILD_SIZE + VAL_SIZE]);
+                MiddleTree::tree[i].emplace_back(parent, child, spannedSlabs);
             }
+            // fill the last node
+            vector<LineSegment> lastParent;
+            vector<MiddleNode*> lastChild;
+            lastParent.reserve(VAL_SIZE);
+            lastChild.reserve(CHILD_SIZE);
+            unsigned int lastSpannedSlabs = 0;
+
+            int s = 0;
+            for (s; (MiddleTree::tree[i].capacity() - 1) * CHILD_SIZE + s
+                        < MiddleTree::tree[i + 1].size()
+                    && s < VAL_SIZE;
+                 s++)
+            {
+                if ((MiddleTree::tree[i].capacity() - 1) * CHILD_SIZE + s
+
+                    < MiddleTree::tree[i + 1].capacity())
+                {
+                    lastParent.emplace_back(
+                        MiddleTree::tree[i + 1]
+                                        [(MiddleTree::tree[i].capacity() - 1)
+                                             * CHILD_SIZE
+                                         + s]
+                                            .getIthVal(VAL_SIZE - 1));
+                }
+                else
+                {
+                    lastParent.emplace_back(INFTY, -1, INFTY, INFTY);
+                }
+                lastSpannedSlabs |=
+                    MiddleTree::tree[i + 1][(MiddleTree::tree[i].capacity() - 1)
+                                                * CHILD_SIZE
+                                            + s]
+                        .getSpannedSlabs();
+                lastChild.emplace_back(
+                    &MiddleTree::tree[i + 1]
+                                     [(MiddleTree::tree[i].capacity() - 1)
+                                          * CHILD_SIZE
+                                      + s]);
+            }
+            if ((MiddleTree::tree[i].capacity() - 1) * CHILD_SIZE + s
+                < MiddleTree::tree[i + 1].capacity())
+            {
+                lastChild.emplace_back(
+                    &MiddleTree::tree[i + 1]
+                                     [(MiddleTree::tree[i].capacity() - 1)
+                                          * CHILD_SIZE
+                                      + s]);
+                lastSpannedSlabs =
+                    MiddleTree::tree[i + 1][(MiddleTree::tree[i].capacity() - 1)
+                                                * CHILD_SIZE
+                                            + s]
+                        .getSpannedSlabs();
+            }
+            else
+            {
+                lastChild.emplace_back(nullptr);
+            }
+            // pad last node with infinities if not full
+            // TODO() fix the binary version. Error on setting the children.
+            for (s; s < VAL_SIZE; s++)
+            {
+                lastParent.emplace_back(INFTY,-1, INFTY, INFTY);
+                lastChild.emplace_back(nullptr);
+                if (s == VAL_SIZE - 1) lastChild.emplace_back(nullptr);
+            }
+
+            MiddleTree::tree[i].emplace_back(lastParent, lastChild, lastSpannedSlabs);
         }
     }
 }

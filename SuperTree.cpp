@@ -4,12 +4,11 @@
 
 #include "SuperTree.h"
 
+#include <chrono>
 #include <cmath>
 
 #include "MiddleTree.h"
 #include "Tree.h"
-
-#include <chrono>
 
 using namespace std;
 
@@ -20,164 +19,229 @@ SuperTree::SuperTree(const int& height, const std::vector<double>& xValues)
     superTree.resize(height);
 
     // construct the leaves of the superTree
-    auto start = std::chrono::high_resolution_clock::now();
-
     unsigned int numOfLeaves = xValues.size() % VAL_SIZE == 0
                                    ? xValues.size() / VAL_SIZE
                                    : xValues.size() / VAL_SIZE + 1;
-    SuperTree::superTree[height - 1].resize(numOfLeaves);
-    for (unsigned int i = 0; i < numOfLeaves; i++)
+
+    auto start = std::chrono::high_resolution_clock::now();
+    SuperTree::superTree.back().reserve(numOfLeaves);
+
+    // fill all leaves but the last one
+    for (unsigned int i = 0;
+         i < SuperTree::superTree.back().capacity() - 1;
+         i++)
     {
+        vector<double> values;
+        values.reserve(VAL_SIZE);
         for (unsigned int j = 0; j < VAL_SIZE; j++)
         {
-            if (i * VAL_SIZE + j < xValues.size())
-            {
-                SuperTree::superTree[height - 1][i].setIthVal(
-                    xValues[i * VAL_SIZE + j], j);
-            }
+            values.emplace_back(xValues[i * VAL_SIZE + j]);
         }
+        SuperTree::superTree[height - 1].emplace_back(values);
     }
-    // fill the last node with infinities if needed
-    if (xValues.size() % VAL_SIZE != 0)
+
+    // fill the last leaf
+    vector<double> values;
+    values.reserve(VAL_SIZE);
+    int t;
+    for (t = 0; (numOfLeaves - 1) * VAL_SIZE + t < xValues.size(); t++)
     {
-        int unfilled = VAL_SIZE - (xValues.size() % VAL_SIZE);
-        for (int i = 0; i < unfilled; i++)
-        {
-            SuperTree::superTree[height - 1][numOfLeaves - 1].setIthVal(
-                INFTY, VAL_SIZE - i - 1);
-        }
+        values.emplace_back(xValues[(numOfLeaves - 1) * VAL_SIZE + t]);
     }
+    // pad last leaf with infinities if not full
+    for (t; t < VAL_SIZE; t++)
+    {
+        values.emplace_back(INFTY);
+    }
+    SuperTree::superTree.back().emplace_back(values);
+
     auto finish = std::chrono::high_resolution_clock::now();
+
     std::chrono::duration<double> elapsed = finish - start;
-    cout <<"constructing leaves nodes: " <<  elapsed.count() <<endl;
+    cout << "constructing leaves nodes: " << elapsed.count() << endl;
+
+    // To keep the invariant of B-tree satisfied, for binary tree, we pick the
+    // parent from the right child.
+    int binaryAdjustment;
+    if (VAL_SIZE == 1)
+        binaryAdjustment = 1;
+    else
+        binaryAdjustment = 0;
+
     // go over every level in the tree, fill values, and children bottom up
     start = std::chrono::high_resolution_clock::now();
     for (int i = height - 2; i > -1; --i)
     {
-        // size = ceil(level below/branching factor)
-        int size = SuperTree::superTree[i + 1].size() % CHILD_SIZE == 0
-                       ? SuperTree::superTree[i + 1].size() / CHILD_SIZE
-                       : (SuperTree::superTree[i + 1].size() / CHILD_SIZE) + 1;
+        // noNodes = ceil(level below/branching factor)
+        int noNodes =
+            (SuperTree::superTree[i + 1].size() % CHILD_SIZE == 0)
+                ? SuperTree::superTree[i + 1].size() / CHILD_SIZE
+                : (SuperTree::superTree[i + 1].size() / CHILD_SIZE) + 1;
 
-        SuperTree::superTree[i].resize(size);
+        SuperTree::superTree[i].reserve(noNodes);
         // go over every node in each level
-        for (int j = 0; j < SuperTree::superTree[i].size(); j++)
+
+        for (int j = 0; j < SuperTree::superTree[i].capacity() - 1; j++)
         {
             // set up the children in each node
-            for (int k = 0; k < CHILD_SIZE; k++)
+            vector<double> parent;
+            vector<SuperNode*> child;
+            parent.reserve(VAL_SIZE);
+            child.reserve(CHILD_SIZE);
+            // fill parent and child
+            for (int l = 0; l < VAL_SIZE; l++)
             {
-                if (j * CHILD_SIZE + k < SuperTree::superTree[i + 1].size())
-                {
-                    SuperTree::superTree[i][j].setIthChild(
-                        SuperTree::superTree[i + 1][j * CHILD_SIZE + k], k);
-
-                    // set up the values in each node (skip every node with
-                    // index multiple of CHILD_SIZE)
-                    if (k < VAL_SIZE)
-                    {
-                        SuperTree::superTree[i][j].setIthVal(
-                            SuperTree::superTree[i + 1][j * CHILD_SIZE + k]
-                                .getVal()
-                                .back(),
-                            k);
-                    }
-                }
+                double childMaxValue =
+                    SuperTree::superTree[i + 1]
+                                        [j * CHILD_SIZE + l + binaryAdjustment]
+                                            .getIthVal(VAL_SIZE - 1);
+                parent.emplace_back(childMaxValue);
+                child.emplace_back(
+                    &SuperTree::superTree[i + 1][j * CHILD_SIZE + l]);
             }
+            // add the last child
+            child.emplace_back(
+                &SuperTree::superTree[i + 1][j * CHILD_SIZE + VAL_SIZE
+                                             + binaryAdjustment]);
+            SuperTree::superTree[i].emplace_back(parent, child);
         }
-        // fill the last node with infinities if needed
-        int filledCells = SuperTree::superTree[i + 1].size() % CHILD_SIZE;
-        if (filledCells != 0)
+        // fill the last node
+        vector<double> lastParent;
+        vector<SuperNode*> lastChild;
+        lastParent.reserve(VAL_SIZE);
+        lastChild.reserve(CHILD_SIZE);
+        // fill last node
+        int s = 0;
+        for (s; (SuperTree::superTree[i].capacity() - 1) * CHILD_SIZE + s
+                    < SuperTree::superTree[i + 1].size()
+                && s < VAL_SIZE;
+             s++)
         {
-            for (int k = filledCells; k < VAL_SIZE; k++)
+            if ((SuperTree::superTree[i].capacity() - 1) * CHILD_SIZE + s
+                    + binaryAdjustment
+                < SuperTree::superTree[i + 1].capacity())
             {
-                SuperTree::superTree[i].back().setIthVal(INFTY, k);
+                lastParent.emplace_back(
+                    SuperTree::superTree
+                        [i + 1]
+                        [(SuperTree::superTree[i].capacity() - 1) * CHILD_SIZE
+                         + s + binaryAdjustment]
+                            .getIthVal(VAL_SIZE - 1));
             }
+            else
+            {
+                lastParent.emplace_back(INFTY);
+            }
+            lastChild.emplace_back(
+                &SuperTree::superTree[i + 1]
+                                     [(SuperTree::superTree[i].capacity() - 1)
+                                          * CHILD_SIZE
+                                      + s]);
         }
+        if ((SuperTree::superTree[i].capacity() - 1) * CHILD_SIZE + s
+                + binaryAdjustment
+            < SuperTree::superTree[i + 1].capacity())
+        {
+            lastChild.emplace_back(
+                &SuperTree::superTree[i + 1]
+                                     [(SuperTree::superTree[i].capacity() - 1)
+                                          * CHILD_SIZE
+                                      + s + binaryAdjustment]);
+        }
+        else
+        {
+            lastChild.emplace_back(nullptr);
+        }
+        // pad last node with infinities if not full
+        // TODO() fix the binary version. Error on setting the children.
+        for (s; s < VAL_SIZE; s++)
+        {
+            lastParent.emplace_back(INFTY);
+            lastChild.emplace_back(nullptr);
+            if (s == VAL_SIZE - 1) lastChild.emplace_back(nullptr);
+        }
+
+        SuperTree::superTree[i].emplace_back(lastParent, lastChild);
     }
     finish = std::chrono::high_resolution_clock::now();
-    elapsed = finish-start;
-    cout << "Building internal nodes: " << elapsed.count() <<endl;
+    elapsed = finish - start;
+    cout << "Building internal nodes: " << elapsed.count() << endl;
 }
 
 // check superRoot is not null
 
 void partitionLineSegments(SuperNode& superRoot,
-                           vector<LineSegment*>& lineSegments,
+                           vector<LineSegment>& lineSegments,
                            vector<vector<LineSegment>*>* left,
                            vector<vector<LineSegment>*>* right,
                            vector<LineSegment>* middle,
-                           vector<vector<LineSegment*>*>* remainingLineSegments)
+                           vector<vector<LineSegment>*>* remainingLineSegments)
 {
     // TODO() remove if statements
-    for (auto& lineSegment : lineSegments)
+    for (auto lineSegment : lineSegments)
 
     {
         // for loop that scan every line segment
         for (int i = 0; i < superRoot.getValSize(); i++)
         {
             // if the lineSegment crosses or touches boundary i
-            if (lineSegment->getXLeft() <= superRoot.getIthVal(i)
-                && lineSegment->getXRight() >= superRoot.getIthVal(i))
+            if (lineSegment.getXLeft() <= superRoot.getIthVal(i)
+                && lineSegment.getXRight() >= superRoot.getIthVal(i))
             {
                 // to the left of first boundary
-                if (i == 0 && lineSegment->getXLeft() < superRoot.getIthVal(i))
+                if (i == 0 && lineSegment.getXLeft() < superRoot.getIthVal(i))
                 {
-                    (*left)[i]->push_back(*lineSegment);
+                    (*left)[i]->push_back(lineSegment);
                 }
                 // starts at slab i-1
-                if (i > 0
-                    && superRoot.getIthVal(i - 1) < lineSegment->getXLeft()
-                    && lineSegment->getXLeft() < superRoot.getIthVal(i))
+                if (i > 0 && superRoot.getIthVal(i - 1) < lineSegment.getXLeft()
+                    && lineSegment.getXLeft() < superRoot.getIthVal(i))
                 {
-                    (*left)[i]->push_back(*lineSegment);
+                    (*left)[i]->push_back(lineSegment);
                 }
                 // to the right of last boundary
 
                 if (i == superRoot.getValSize() - 1
-                    && lineSegment->getXRight() > superRoot.getIthVal(i))
+                    && lineSegment.getXRight() > superRoot.getIthVal(i))
                 {
-                    (*right)[i]->push_back(*lineSegment);
+                    (*right)[i]->push_back(lineSegment);
                 }
 
                 // ends at slab i
                 if (i < superRoot.getValSize() - 1
-                    && lineSegment->getXRight() < superRoot.getIthVal(i + 1)
-                    && lineSegment->getXRight() > superRoot.getIthVal(i))
+                    && lineSegment.getXRight() < superRoot.getIthVal(i + 1)
+                    && lineSegment.getXRight() > superRoot.getIthVal(i))
                 {
-                    (*right)[i]->push_back(*lineSegment);
+                    (*right)[i]->push_back(lineSegment);
                 }
                 // case lineSegment crosses slab i
                 if (i < superRoot.getValSize() - 1
-                    && lineSegment->getXRight() >= superRoot.getIthVal(i + 1))
+                    && lineSegment.getXRight() >= superRoot.getIthVal(i + 1))
                 {
-                    // check this for pointers
-                    // if (find(middle->begin(), middle->end(), *lineSegment)
-                    //    == middle->end())
-                    {
-                        middle->push_back(*lineSegment);
-                    }
+                    if (!middle->empty() && middle->back() == lineSegment)
+                        continue;
+                    middle->push_back(lineSegment);
                 }
             }
             // case it does not cross any boundary
             else
             {
                 // case it ends before first boundary
-                if (i == 0 && lineSegment->getXRight() < superRoot.getIthVal(i))
+                if (i == 0 && lineSegment.getXRight() < superRoot.getIthVal(i))
                 {
                     (*remainingLineSegments)[i]->push_back(lineSegment);
                 }
                 // case it starts after last boundary
                 if (i == superRoot.getValSize() - 1
-                    && lineSegment->getXLeft() > superRoot.getIthVal(i))
+                    && lineSegment.getXLeft() > superRoot.getIthVal(i))
                 {
                     (*remainingLineSegments)[i + 1]->push_back(lineSegment);
                 }
                 // case it is between two boundaries i and i +1 i.e. b_i < left
                 // x < b_i+1
 
-                if (i > 0
-                    && lineSegment->getXLeft() > superRoot.getIthVal(i - 1)
-                    && lineSegment->getXRight() < superRoot.getIthVal(i))
+                if (i > 0 && lineSegment.getXLeft() > superRoot.getIthVal(i - 1)
+                    && lineSegment.getXRight() < superRoot.getIthVal(i))
                 {
                     (*remainingLineSegments)[i]->push_back(lineSegment);
                 }
@@ -241,7 +305,7 @@ void constructMiddleTree(SuperNode& superRoot, vector<LineSegment>* middle)
     superRoot.setMiddle(middleRoot);
 }
 
-void fillSuperTree(SuperNode& superRoot, vector<LineSegment*>& lineSegments)
+void fillSuperTree(SuperNode& superRoot, vector<LineSegment>& lineSegments)
 {
     auto* left = new vector<vector<LineSegment>*>(superRoot.getValSize());
     auto* right = new vector<vector<LineSegment>*>(superRoot.getValSize());
@@ -251,23 +315,23 @@ void fillSuperTree(SuperNode& superRoot, vector<LineSegment*>& lineSegments)
     // initialize the remainingLineSegments that left out from left, right, and
     // middle
     auto* remainingLineSegments =
-        new vector<vector<LineSegment*>*>(superRoot.getValSize() + 1);
+        new vector<vector<LineSegment>*>(superRoot.getValSize() + 1);
 
     for (int i = 0; i < superRoot.getValSize(); i++)
     {
         (*left)[i] = new vector<LineSegment>();
         (*right)[i] = new vector<LineSegment>();
-        (*remainingLineSegments)[i] = new vector<LineSegment*>();
+        (*remainingLineSegments)[i] = new vector<LineSegment>();
     }
 
     // initialize the last child to an empty vector
     (*remainingLineSegments)[superRoot.getValSize()] =
-        new vector<LineSegment*>();
+        new vector<LineSegment>();
 
     // partition lineSegments into left, middle and right and
     // remainingLineSegments
 
-    //cout <<"partitioning the data" <<endl;
+    // cout <<"partitioning the data" <<endl;
     partitionLineSegments(
         superRoot, lineSegments, left, right, middle, remainingLineSegments);
     // cout << "\nPartition of lineSegments into left, right, middle and
@@ -278,7 +342,7 @@ void fillSuperTree(SuperNode& superRoot, vector<LineSegment*>& lineSegments)
         constructLeftTrees(superRoot, left);
     }
 
-    //cout <<"consrcuted left trees" <<endl;
+    // cout <<"consrcuted left trees" <<endl;
 
     // cout << "\nConstructing Left tree ----> Done.";
     // construct the right B-trees for each cell of superRoot
@@ -286,7 +350,7 @@ void fillSuperTree(SuperNode& superRoot, vector<LineSegment*>& lineSegments)
     {
         constructRightTrees(superRoot, right);
     }
-    //cout <<"consrcuted right trees" <<endl;
+    // cout <<"consrcuted right trees" <<endl;
     // cout << "\nConstrcuting right tree ----> Done.";
     // construct the middle B-trees
     if (!middle->empty())
@@ -306,7 +370,7 @@ void fillSuperTree(SuperNode& superRoot, vector<LineSegment*>& lineSegments)
         }
     }
 
-    //cout <<"consrcuted middle trees" <<endl;
+    // cout <<"consrcuted middle trees" <<endl;
     delete left;
     delete right;
     delete middle;
@@ -422,8 +486,8 @@ const LineSegment& pointLocationLeft(const Node* root, Point& point)
         {
             // check the subTree to my right
             segment = max(segment,
-                           pointLocationLeft(root->getIthChild(index), point),
-                           YLeftLessThan());
+                          pointLocationLeft(root->getIthChild(index), point),
+                          YLeftLessThan());
         }
         // case nothing intersect within the sub-tree i.e. root is a leaf
         if (segment.getYLeft() == INFTY
@@ -469,8 +533,8 @@ const LineSegment& pointLocationRight(const Node* root, Point& point)
         {
             // check the subTree to my right
             segment = max(segment,
-                           pointLocationRight(root->getIthChild(index), point),
-                           YLeftLessThan());
+                          pointLocationRight(root->getIthChild(index), point),
+                          YLeftLessThan());
         }
         // case nothing intersect within the sub-tree i.e root is a leaf node
         if (segment.getYLeft() == INFTY
@@ -543,8 +607,8 @@ const LineSegment& pointLocationMiddle(const MiddleNode* root,
         // case nothing intersects within the sub-tree i.e. child[index] returns
         // empty lineSegment
         if (segment.getYLeft() == INFTY
-            && root->getIthVal(index).getXLeft() <= point.getX() && point.getX()
-                   <= root->getIthVal(index).getXRight()
+            && root->getIthVal(index).getXLeft() <= point.getX()
+            && point.getX() <= root->getIthVal(index).getXRight()
             && root->getIthVal(index).getYLeft() <= point.getY())
         {
             segment = root->getIthVal(index);
